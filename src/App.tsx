@@ -1,35 +1,40 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useAtom } from "jotai";
+import themeMode from "./store/theme.mode";
+import { isClosedServer, isRestartingServer } from "./store/server.store";
+import { useLayoutEffect } from "react";
+import isServerOnline from "./service/server/isServerOnline.service";
+import { CustomProvider, Loader } from "rsuite";
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorFallback from "./components/ErrorFallback/ErrorFallback.componennt";
+import Routes from "./routes/Routes";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [darkMode] = useAtom(themeMode);
+  const [restartingServer, setRestartingServer] = useAtom(isRestartingServer);
+  const [closedServer, setClosedServer] = useAtom(isClosedServer);
+
+  useLayoutEffect(() => {
+    document.title = "Loading...";
+    isServerOnline([setClosedServer, setRestartingServer]);
+  }, []);
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Flow Editor</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      {typeof closedServer === "boolean" && closedServer ? (
+        <></>
+      ) : (
+        <CustomProvider theme={darkMode ? "dark" : "light"}>
+          {typeof restartingServer === "boolean" && restartingServer ? (
+            <Loader backdrop content="loading..." />
+          ) : (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <Routes />
+            </ErrorBoundary>
+          )}
+        </CustomProvider>
+      )}
     </>
   );
 }
 
-export default App
+export default App;

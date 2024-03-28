@@ -1,0 +1,27 @@
+@import "rsuite/styles/index.less";
+@import "./color.scheme.less";
+
+@enable-dark-mode: true;
+@enable-high-contrast: false;
+@primary-color2: #000;
+@enable-ripple-effect: false;
+
+.rs-theme-dark {
+  --rs-body: #292929;
+  --rs-steps-border-state-finish: #ffffff;
+  --rs-steps-state-finish: #ffffff;
+  --rs-steps-state-process: #bfbfbf;
+  --rs-tooltip-bg: var(--rs-gray-900);
+}
+
+.rs-theme-light {
+  --rs-body: #fefef9;
+  --rs-steps-border-state-finish: #202020;
+  --rs-steps-state-finish: #202020;
+  --rs-steps-state-process: #292929;
+  --rs-tooltip-bg: var(--rs-gray-500);
+}
+
+.rs-toast-container {
+  z-index: 2000;
+}
