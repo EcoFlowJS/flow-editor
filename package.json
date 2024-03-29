@@ -24,6 +24,7 @@
     "react-dom": "^18.2.0",
     "react-error-boundary": "^4.0.13",
     "react-router-dom": "^6.22.3",
+    "reactflow": "^11.10.4",
     "rsuite": "^5.53.0",
     "socket.io-client": "^4.7.5"
   },

@@ -138,11 +138,6 @@ export default function BaseLayout() {
       if (!initStatus.isNew && !initStatus.isLoggedIn) redirect("/auth/login");
       if (!initStatus.isNew && initStatus.isLoggedIn) {
         navigate(location.pathname.substring("/editor/flow/".length));
-        if (
-          location.pathname === "/editor/flow" ||
-          location.pathname === "/editor/flow/"
-        )
-          navigate("dashboard");
         fetchUserPermissions("Permissions").then((response) => {
           if (response.success) {
             setPermissionsFetched(true);
