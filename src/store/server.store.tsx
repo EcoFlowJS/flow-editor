@@ -1,4 +1,4 @@
-import { ApiResponse } from "@eco-flow/types";
+import { ApiResponse } from "@ecoflow/types";
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 

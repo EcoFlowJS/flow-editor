@@ -1,5 +1,5 @@
-import { PageLoader } from "@eco-flow/components-lib";
-import "@eco-flow/components-lib/style.css";
+import { PageLoader } from "@ecoflow/components-lib";
+import "@ecoflow/components-lib/style.css";
 import { FlexboxGrid } from "rsuite";
 
 export default function Loading() {

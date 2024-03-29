@@ -1,4 +1,4 @@
-import { UserPermissions } from "@eco-flow/types";
+import { UserPermissions } from "@ecoflow/types";
 import { Socket } from "socket.io-client";
 
 const handlers = (IO: Socket) => {

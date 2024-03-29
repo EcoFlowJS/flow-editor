@@ -4,7 +4,7 @@ import {
   successNotification,
 } from "../../store/notification.store";
 import { useAtom } from "jotai";
-import { useNotification } from "@eco-flow/components-lib";
+import { useNotification } from "@ecoflow/components-lib";
 import { useEffect, useState } from "react";
 import { initService } from "../../service/init/init.service";
 import initStatusState, {

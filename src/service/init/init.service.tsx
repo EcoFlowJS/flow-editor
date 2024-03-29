@@ -1,5 +1,5 @@
 import axios from "../../utils/axios/axios";
-import { ApiResponse } from "@eco-flow/types";
+import { ApiResponse } from "@ecoflow/types";
 
 const promise = async (): Promise<any> => {
   let result = {
