@@ -24,8 +24,8 @@ import {
 import defaultPermissions from "../../defaults/defaultPermissions.default";
 import baseSocketIOHndlers from "./baseSocketIO.handlers";
 import userSignoutService from "../../service/user/userSignout.service";
-import Loading from "../Loading/Loading.component";
 import useNavigator from "../../utils/useNavigator/useNavigator";
+import Loading from "../../components/Loading/Loading.component";
 
 export default function BaseLayout() {
   //Redirect Handler
