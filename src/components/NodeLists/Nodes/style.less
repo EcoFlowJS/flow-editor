@@ -1,0 +1,79 @@
+.rs-sidenav-collapse-in .rs-dropdown-node {
+  padding: 8px 16px !important;
+}
+
+.node {
+  position: relative;
+  background-color: rgb(148, 193, 208);
+  color: white;
+  width: 130px;
+  border-radius: 6px;
+  cursor: move;
+  border: 2px solid var(--rs-border-primary);
+
+  .node-icon-left {
+    position: absolute;
+    text-align: center;
+    vertical-align: middle;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 30px;
+    font-size: larger;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-right: 1px solid var(--rs-border-primary);
+    background-color: rgba(0, 0, 0, 0.28);
+  }
+
+  .node-icon-right {
+    position: absolute;
+    text-align: center;
+    vertical-align: middle;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 30px;
+    font-size: larger;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-left: 1px solid var(--rs-border-primary);
+    background-color: rgba(0, 0, 0, 0.28);
+  }
+
+  .node-connection-left {
+    display: block;
+    width: 8px;
+    height: 8px;
+    position: absolute;
+    left: -4px;
+    top: calc(calc(100% / 2) - 4px);
+    background-color: #ccc;
+    border-radius: 2px;
+    z-index: 1000;
+  }
+
+  .node-connection-right {
+    display: block;
+    width: 8px;
+    height: 8px;
+    position: absolute;
+    right: -4px;
+    top: calc(calc(100% / 2) - 4px);
+    background-color: #ccc;
+    border-radius: 2px;
+    z-index: 1000;
+  }
+
+  .node-label {
+    width: 90px;
+    padding: 5px 0 5px 35px;
+    text-align: center;
+    overflow: hidden;
+    word-wrap: break-word;
+  }
+
+  &:hover {
+    border: 2px solid #ff7f0e;
+  }
+}

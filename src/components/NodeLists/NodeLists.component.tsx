@@ -1,51 +1,100 @@
-import { Nav, Sidebar, Sidenav } from "rsuite";
+import { Nav, Placeholder, Sidebar, Sidenav } from "rsuite";
+import Nodes from "./Nodes/Nodes.component";
+import { useEffect, useState } from "react";
+import fetchModules from "../../service/module/fetchModules.server";
+import { useAtom } from "jotai";
+import { ecoModules as EcoModules } from "../../store/module.store";
+import { Modules } from "@ecoflow/types";
+import FilterNode from "./FilterNode/FilterNode.component";
+import cloneDeep from "lodash/cloneDeep";
+import "./style.less";
 
 export default function NodeLists() {
-  const navigationHandler = () => {};
-  const onDragStart = (event: any, nodeType: any) => {
-    event.dataTransfer.setData("application/reactflow", nodeType);
-    event.dataTransfer.effectAllowed = "move";
+  const [isLoading, setLoading] = useState(true);
+  const [ecoModules, setEcoModules] = useAtom(EcoModules);
+  const [modules, setModules] = useState<Modules>([]);
+  const [openKeys, setOpenKeys] = useState<string[]>([]);
+
+  const updateKeyHandler = (key: string) => {
+    setOpenKeys((openKeys) =>
+      openKeys.filter((openKey) => openKey === key).length > 0
+        ? openKeys.filter((openKey) => openKey !== key)
+        : [...openKeys, key]
+    );
   };
+
+  const filterNodeHandler = (value: string) => {
+    if (value.trim().length === 0) {
+      setModules(cloneDeep(ecoModules));
+      return;
+    }
+
+    setModules(
+      cloneDeep(ecoModules)
+        .map((module) => {
+          module.nodes = module.nodes.filter((node) =>
+            node.name.toLowerCase().includes(value.toLowerCase())
+          );
+          return module.nodes.length > 0 ? module : null;
+        })
+        .filter((node) => node !== null) as Modules
+    );
+  };
+
+  useEffect(() => setModules(cloneDeep(ecoModules)), [ecoModules]);
+
+  useEffect(() => {
+    fetchModules().then((response) => {
+      setLoading(false);
+      if (response.success) {
+        setEcoModules(cloneDeep(response.payload));
+        setOpenKeys((response.payload as Modules).map((m) => m.id._id));
+      }
+    });
+  }, []);
 
   return (
     <Sidebar
+      width={200}
+      className="sidebar"
       style={{ display: "flex", flexDirection: "column" }}
-      width={260}
-      collapsible
     >
+      <FilterNode onChange={filterNodeHandler} />
       <Sidenav
         expanded
+        className="sidenav-scrollbar"
         style={{
-          height: "calc(100vh - 56px)",
+          height: "calc(100vh - 57px - 35px)",
           minHeight: 600,
           overflow: "auto",
         }}
-        openKeys={["3"]}
+        openKeys={openKeys}
       >
         <Sidenav.Body>
-          <Nav onSelect={navigationHandler}>
-            <Nav.Menu
-              eventKey="3"
-              trigger="hover"
-              title="Advanced"
-              placement="rightStart"
-            >
-              {[...Array(100)].map((_x, i) => (
-                <Nav.Item
-                  key={i}
-                  draggable
-                  onDragStart={(event) => {
-                    onDragStart(
-                      event,
-                      i / 3 === 0 ? "output" : i / 2 === 0 ? "default" : "input"
-                    );
-                  }}
+          {isLoading ? (
+            <Placeholder.Paragraph active rows={5} />
+          ) : (
+            <Nav>
+              {modules.map((module, key) => (
+                <Nav.Menu
+                  key={key}
+                  eventKey={module.id._id}
+                  title={module.name}
+                  placement="rightStart"
+                  onClick={() => updateKeyHandler(module.id._id)}
                 >
-                  Available Packages
-                </Nav.Item>
+                  {module.nodes.map((node, key) => (
+                    <Nodes
+                      key={key}
+                      nodeID={node.id}
+                      type={node.type}
+                      label={node.name}
+                    />
+                  ))}
+                </Nav.Menu>
               ))}
-            </Nav.Menu>
-          </Nav>
+            </Nav>
+          )}
         </Sidenav.Body>
       </Sidenav>
     </Sidebar>

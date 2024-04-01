@@ -1,0 +1,22 @@
+.sidebar {
+  border-right: 1px solid var(--dashboard-navbar-border-color);
+  .sidenav-scrollbar {
+    &::-webkit-scrollbar {
+      width: 6px;
+      &-track {
+        background-color: var(--scrollbar-track-color);
+        border-radius: 6px;
+      }
+      &-thumb {
+        background-color: var(--rs-text-secondary);
+        border-radius: 6px;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.rs-dropdown .rs-dropdown-toggle {
+  padding-left: 20px !important;
+  word-wrap: break-word;
+}

@@ -1,5 +1,4 @@
 import NodeLists from "../../components/NodeLists/NodeLists.component";
-import FlowEditor from "../../components/FlowEditor/FlowEditor.component";
 import Header from "../../components/Header/Header.component";
 import { useLayoutEffect } from "react";
 import { Container, Content } from "rsuite";
@@ -14,9 +13,7 @@ export default function Editor() {
       <Header />
       <Container>
         <NodeLists />
-        <Content>
-          <FlowEditor />
-        </Content>
+        <Content>{/* <FlowEditor /> */}</Content>
       </Container>
     </Container>
   );

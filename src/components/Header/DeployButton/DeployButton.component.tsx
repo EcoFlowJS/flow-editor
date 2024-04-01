@@ -10,6 +10,7 @@ import ArrowDownIcon from "@rsuite/icons/ArrowDown";
 import { IconWrapper } from "@ecoflow/components-lib";
 import { GrDeploy } from "react-icons/gr";
 import { RiNodeTree, RiRestartLine } from "react-icons/ri";
+import { TbBinaryTree2 } from "react-icons/tb";
 
 export default function DeployButton() {
   return (
@@ -39,10 +40,16 @@ export default function DeployButton() {
                   Full Deploy
                 </Dropdown.Item>
                 <Dropdown.Item
-                  eventKey="OnlyModified"
+                  eventKey="CurrentFlow"
+                  icon={<IconWrapper icon={TbBinaryTree2} />}
+                >
+                  Current Flow
+                </Dropdown.Item>
+                <Dropdown.Item
+                  eventKey="OnlyModifiedNode"
                   icon={<IconWrapper icon={RiNodeTree} />}
                 >
-                  Modified Only
+                  Modified Nodes
                 </Dropdown.Item>
                 <Dropdown.Separator />
                 <Dropdown.Item
