@@ -15,14 +15,6 @@ export default function NodeLists() {
   const [modules, setModules] = useState<Modules>([]);
   const [openKeys, setOpenKeys] = useState<string[]>([]);
 
-  const updateKeyHandler = (key: string) => {
-    setOpenKeys((openKeys) =>
-      openKeys.filter((openKey) => openKey === key).length > 0
-        ? openKeys.filter((openKey) => openKey !== key)
-        : [...openKeys, key]
-    );
-  };
-
   const filterNodeHandler = (value: string) => {
     if (value.trim().length === 0) {
       setModules(cloneDeep(ecoModules));
@@ -68,6 +60,7 @@ export default function NodeLists() {
           minHeight: 600,
           overflow: "auto",
         }}
+        onOpenChange={setOpenKeys}
         openKeys={openKeys}
       >
         <Sidenav.Body>
@@ -81,7 +74,6 @@ export default function NodeLists() {
                   eventKey={module.id._id}
                   title={module.name}
                   placement="rightStart"
-                  onClick={() => updateKeyHandler(module.id._id)}
                 >
                   {module.nodes.map((node, key) => (
                     <Nodes
