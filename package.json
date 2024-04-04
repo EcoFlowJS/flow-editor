@@ -18,6 +18,7 @@
     "@emotion/styled": "^11.11.5",
     "@koa/router": "^11.0.2",
     "@mui/material": "^5.15.14",
+    "@rsuite/responsive-nav": "^5.0.1",
     "axios": "^1.6.8",
     "jotai": "^2.7.1",
     "koa": "^2.14.2",

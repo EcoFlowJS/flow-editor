@@ -40,7 +40,10 @@ export default function Nodes({
   ...props
 }: NodesProps) {
   const onDragStartNodeHandler = (event: any) => {
-    event.dataTransfer.setData("application/reactflow", { nodeID, type });
+    event.dataTransfer.setData(
+      "application/reactflow",
+      JSON.stringify({ nodeID, type, label })
+    );
     event.dataTransfer.effectAllowed = "move";
   };
 
@@ -54,7 +57,7 @@ export default function Nodes({
       }
       {...props}
     >
-      <FlexboxGrid justify="center" align="middle">
+      <FlexboxGrid justify="center" align="middle" style={{ width: "100%" }}>
         <FlexboxGrid.Item>
           <div
             className="node"
