@@ -4,12 +4,12 @@ import { FlexboxGrid } from "rsuite";
 import { IconWrapper } from "@ecoflow/components-lib";
 import { TbRouteSquare2 } from "react-icons/tb";
 
-const RequestNode = memo(({ id, data, isConnectable }: NodeProps) => {
+const RequestNode = memo(({ id, data, isConnectable, selected }: NodeProps) => {
   return (
     <>
       <FlexboxGrid justify="center" align="middle" style={{ width: "100%" }}>
         <FlexboxGrid.Item>
-          <div className="node">
+          <div className={`node ${selected ? "selected" : ""}`}>
             <div className="node-icon-left">
               <FlexboxGrid
                 justify="center"

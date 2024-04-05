@@ -5,12 +5,12 @@ import { NodeProps, Position } from "reactflow";
 import { FlexboxGrid } from "rsuite";
 import NodeTargetHandler from "./NodeTargetHandler/NodeTargetHandler.component";
 
-const ResponseNode = memo(({ id, data }: NodeProps) => {
+const ResponseNode = memo(({ id, data, selected }: NodeProps) => {
   return (
     <>
       <FlexboxGrid justify="center" align="middle" style={{ width: "100%" }}>
         <FlexboxGrid.Item>
-          <div className="node">
+          <div className={`node ${selected ? "selected" : ""}`}>
             <div
               className="node-label"
               style={{ padding: "5px 35px 5px 10px" }}
