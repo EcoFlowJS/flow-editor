@@ -4,12 +4,12 @@ import { CgDebug } from "react-icons/cg";
 import { Handle, NodeProps, Position } from "reactflow";
 import { FlexboxGrid } from "rsuite";
 
-const DebugNode = memo(({ id, data, isConnectable }: NodeProps) => {
+const DebugNode = memo(({ id, data, isConnectable, selected }: NodeProps) => {
   return (
     <>
       <FlexboxGrid justify="center" align="middle" style={{ width: "100%" }}>
         <FlexboxGrid.Item>
-          <div className="node">
+          <div className={`node ${selected ? "selected" : ""}`}>
             <div
               className="node-label"
               style={{ padding: "5px 35px 5px 10px" }}
