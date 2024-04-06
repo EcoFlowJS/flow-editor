@@ -19,6 +19,7 @@ import "./style.less";
 import MiddlewareNode from "./MiddlewareNode/MiddlewareNode.component";
 import ResponseNode from "./ResponseNode/ResponseNode.component";
 import DebugNode from "./DebugNode/DebugNode.component";
+import flowEditorHandlers from "../../hooks/flowEditorHandlers.hook";
 
 const initialNodes: Node[] = [];
 
@@ -33,6 +34,7 @@ const nodeTypes = {
 };
 
 export default function FlowEditor() {
+  const handlers = flowEditorHandlers();
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
@@ -81,7 +83,10 @@ export default function FlowEditor() {
     [reactFlowInstance]
   );
 
-  useEffect(() => console.log(edges), [edges]);
+  useEffect(
+    () => console.log(handlers.flowEditorValue),
+    [handlers.flowEditorValue]
+  );
 
   return (
     <>
