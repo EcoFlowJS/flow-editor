@@ -1,6 +1,6 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { flowEditor } from "../store/flowEditor.store";
-import { DeploymentFlowConfigurations } from "@ecoflow/types";
+import { Describtions } from "@ecoflow/types";
 import { isUndefined } from "lodash";
 
 const flowEditorHandlers = () => {
@@ -40,7 +40,7 @@ const flowEditorHandlers = () => {
 
   const updateFlowEditor = (
     flowName: string,
-    flowsConfigurations: DeploymentFlowConfigurations
+    flowsConfigurations: Describtions
   ) =>
     setFlowEditor((flow) => {
       if (!isUndefined(flow[flowName])) flow[flowName] = flowsConfigurations;

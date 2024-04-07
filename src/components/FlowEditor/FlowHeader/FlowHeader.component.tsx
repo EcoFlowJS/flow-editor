@@ -16,15 +16,21 @@ import { errorNotification } from "../../../store/notification.store";
 
 interface FlowHeaderProps {
   onFlowSelect?: (flowName: string) => void;
+  disabled?: boolean;
 }
 
 export default function FlowHeader({
   onFlowSelect = () => {},
+  disabled,
 }: FlowHeaderProps) {
   const flowHandlers = flowEditorHandlers();
-  const [activeKey, setActiveKey] = useState<string>("Flow1");
+  const [activeKey, setActiveKey] = useState<string>("");
   const [nameFormValue, setNameFormValue] = useState({ flowName: "" });
-  const [flows, setFlows] = useState(Object.keys(flowHandlers.flowEditorValue));
+  const [flows, setFlows] = useState(
+    Object.keys(flowHandlers.flowEditorValue).length > 0
+      ? Object.keys(flowHandlers.flowEditorValue)
+      : ["Flow1"]
+  );
   const [addRenameOpen, setAddRenameOpen] = useState<{
     show: boolean;
     mode?: "ADD" | "EDIT";
@@ -85,11 +91,15 @@ export default function FlowHeader({
   };
 
   useEffect(() => {
-    if (Object.keys(flowHandlers.flowEditorValue).length === 0) {
-      setFlows([...flows, activeKey]);
-      flowHandlers.addFlow(activeKey);
+    if (
+      !isUndefined(disabled) &&
+      !disabled &&
+      Object.keys(flowHandlers.flowEditorValue).length === 0
+    ) {
+      setActiveKey("Flow1");
+      flowHandlers.addFlow("Flow1");
     }
-  }, []);
+  }, [disabled]);
 
   useEffect(() => onFlowSelect(activeKey), [activeKey]);
 
@@ -120,6 +130,7 @@ export default function FlowHeader({
               <ResponsiveNav.Item
                 as="div"
                 key={flow}
+                disabled={disabled}
                 eventKey={flow}
                 onDoubleClick={() =>
                   setAddRenameOpen({
@@ -144,6 +155,7 @@ export default function FlowHeader({
                 <IconButton
                   appearance="subtle"
                   icon={<IconWrapper icon={BiSolidLayerPlus} />}
+                  disabled={disabled}
                   onClick={() =>
                     setAddRenameOpen({
                       show: true,
