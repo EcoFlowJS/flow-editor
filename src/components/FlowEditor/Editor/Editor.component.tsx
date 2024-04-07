@@ -19,11 +19,12 @@ import "./style.less";
 
 interface EditorProps {
   flow?: string;
+  disabled?: boolean;
 }
 let id = 0;
 const getId = (nodeID: string) => `${nodeID}_${id++}`;
 
-export default function Editor({ flow = "" }: EditorProps) {
+export default function Editor({ flow = "", disabled = false }: EditorProps) {
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -102,14 +103,20 @@ export default function Editor({ flow = "" }: EditorProps) {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onInit={setReactFlowInstance}
-        onDrop={onDrop}
+        onDrop={disabled ? undefined : onDrop}
         snapToGrid
         snapGrid={[20, 20]}
-        onDragOver={onDragOver}
+        onDragOver={disabled ? undefined : onDragOver}
         fitView
         attributionPosition="top-right"
+        nodesDraggable={!disabled}
+        nodesConnectable={!disabled}
+        elementsSelectable={!disabled}
+        zoomOnScroll={!disabled}
+        panOnDrag={!disabled}
+        deleteKeyCode="Delete"
       >
-        <MiniMap zoomable pannable />
+        <MiniMap zoomable={!disabled} pannable={!disabled} />
         <Controls />
         <Background color="#aaa" gap={20} />
       </ReactFlow>
