@@ -1,6 +1,6 @@
-import { DeploymentConfigurations } from "@ecoflow/types";
+import { FlowsConfigurations } from "@ecoflow/types";
 import { atom } from "jotai";
 
-const flowEditor = atom<DeploymentConfigurations>({});
+const flowEditor = atom<FlowsConfigurations>({});
 
 export { flowEditor };
