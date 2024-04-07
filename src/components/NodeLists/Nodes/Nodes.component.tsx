@@ -2,6 +2,7 @@ import {
   CSSProperties,
   DetailedHTMLProps,
   DragEventHandler,
+  DragEvent,
   FC,
   HTMLAttributes,
   LiHTMLAttributes,
@@ -39,9 +40,9 @@ export default function Nodes({
   onDragStart,
   ...props
 }: NodesProps) {
-  const onDragStartNodeHandler = (event: any) => {
+  const onDragStartNodeHandler = (event: DragEvent<HTMLDivElement>) => {
     event.dataTransfer.setData(
-      "application/reactflow",
+      "application/ecoflow/nodes",
       JSON.stringify({ nodeID, type, label })
     );
     event.dataTransfer.effectAllowed = "move";

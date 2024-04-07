@@ -1,6 +1,6 @@
 import { FlexboxGrid, IconButton, Tooltip, Whisper } from "rsuite";
 import ResponsiveNav from "@rsuite/responsive-nav";
-import { useEffect, useState } from "react";
+import { KeyboardEvent, useEffect, useState } from "react";
 import {
   AlertModal,
   IconWrapper,
@@ -8,61 +8,57 @@ import {
   FormGroup,
 } from "@ecoflow/components-lib";
 import { BiSolidLayerPlus } from "react-icons/bi";
-import { Flows } from "@ecoflow/types";
 import "./style.less";
 import flowEditorHandlers from "../../../hooks/flowEditorHandlers.hook";
-import { isUndefined } from "lodash";
+import { isEmpty, isUndefined } from "lodash";
+import { useSetAtom } from "jotai";
+import { errorNotification } from "../../../store/notification.store";
 
 interface FlowHeaderProps {
-  flows?: Flows;
+  onFlowSelect?: (flowName: string) => void;
 }
 
-export default function FlowHeader({ flows }: FlowHeaderProps) {
+export default function FlowHeader({
+  onFlowSelect = () => {},
+}: FlowHeaderProps) {
   const flowHandlers = flowEditorHandlers();
-  const [activeKey, setActiveKey] = useState<string | number>("Flow1");
+  const [activeKey, setActiveKey] = useState<string>("Flow1");
   const [nameFormValue, setNameFormValue] = useState({ flowName: "" });
+  const [flows, setFlows] = useState(Object.keys(flowHandlers.flowEditorValue));
   const [addRenameOpen, setAddRenameOpen] = useState<{
     show: boolean;
     mode?: "ADD" | "EDIT";
     editID?: string;
-  }>({ show: false, mode: "ADD" });
-  const [items, setItems] = useState(
-    flows
-      ? flows.map((flow) => {
-          return {
-            eventKey: flow,
-            label: flow,
-          };
-        })
-      : [{ eventKey: "Flow1", label: "Flow1" }]
-  );
+  }>({ show: false });
 
-  const onSelectHandler = (eventKey: string | number | undefined) => {
+  //Notifications
+  const errorNoti = useSetAtom(errorNotification);
+
+  const onSelectHandler = (eventKey?: string) =>
     setActiveKey((key) => (typeof eventKey !== "undefined" ? eventKey : key));
-  };
 
   const removeFlowHandler = (eventKey: string) => {
-    const nextItems = [...items];
-    const removedFlow = nextItems.splice(
-      nextItems.indexOf({ eventKey, label: eventKey }),
-      1
-    );
-    setItems(nextItems);
-    setActiveKey(nextItems[0] ? nextItems[0].eventKey : "");
-    flowHandlers.removeFlow(removedFlow[0].eventKey);
+    const nextFlows = [...flows];
+    const removedFlow = nextFlows.splice(nextFlows.indexOf(eventKey), 1);
+    setFlows(nextFlows);
+    setActiveKey(nextFlows[0] ? nextFlows[0] : "");
+    flowHandlers.dropFlow(removedFlow[0]);
   };
 
   const addRenameHandler = (flowID?: string) => {
+    if (isEmpty(nameFormValue.flowName)) {
+      errorNoti({
+        show: true,
+        header: "Flow Error",
+        message: "Please enter a name for flow",
+      });
+      return;
+    }
+
     try {
       if (isUndefined(flowID)) {
-        flowHandlers.addFlows(nameFormValue.flowName);
-        setItems([
-          ...items,
-          {
-            eventKey: nameFormValue.flowName,
-            label: nameFormValue.flowName,
-          },
-        ]);
+        flowHandlers.addFlow(nameFormValue.flowName);
+        setFlows([...flows, nameFormValue.flowName]);
         setNameFormValue((name) => {
           name.flowName = "";
           return name;
@@ -70,30 +66,32 @@ export default function FlowHeader({ flows }: FlowHeaderProps) {
         setAddRenameOpen({ show: false });
         return;
       }
-      flowHandlers.renameFlow({
-        oldName: flowID,
-        newName: nameFormValue.flowName,
-      });
-      items.splice(items.indexOf({ eventKey: flowID, label: flowID }), 1, {
-        eventKey: nameFormValue.flowName,
-        label: nameFormValue.flowName,
-      });
-      setItems(items);
+      flowHandlers.renameFlow(flowID, nameFormValue.flowName);
+      flows.splice(flows.indexOf(flowID), 1, nameFormValue.flowName);
+      setFlows(flows);
       setNameFormValue((name) => {
         name.flowName = "";
         return name;
       });
       setAddRenameOpen({ show: false });
       if (activeKey === flowID) setActiveKey(nameFormValue.flowName);
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      errorNoti({
+        show: true,
+        header: "Flow Error",
+        message: typeof error === "string" ? error : String(error),
+      });
     }
   };
 
   useEffect(() => {
-    if (isUndefined(flows) || (flows && flows.length === 0))
-      flowHandlers.addFlows("Flow1");
+    if (Object.keys(flowHandlers.flowEditorValue).length === 0) {
+      setFlows([...flows, activeKey]);
+      flowHandlers.addFlow(activeKey);
+    }
   }, []);
+
+  useEffect(() => onFlowSelect(activeKey), [activeKey]);
 
   useEffect(() => {
     if (!addRenameOpen.show) setNameFormValue({ flowName: "" });
@@ -110,28 +108,28 @@ export default function FlowHeader({ flows }: FlowHeaderProps) {
         <FlexboxGrid.Item colspan={22}>
           <ResponsiveNav
             className="flow-selector"
-            removable={items.length > 1}
+            removable={flows.length > 1}
             appearance="tabs"
             activeKey={activeKey}
-            onSelect={onSelectHandler}
+            onSelect={(eventKey) => onSelectHandler(eventKey?.toString())}
             onItemRemove={(eventKey: string | number) =>
               removeFlowHandler(eventKey.toString())
             }
           >
-            {items.map((item) => (
+            {flows.map((flow) => (
               <ResponsiveNav.Item
                 as="div"
-                key={item.eventKey}
-                eventKey={item.eventKey}
+                key={flow}
+                eventKey={flow}
                 onDoubleClick={() =>
                   setAddRenameOpen({
                     show: true,
                     mode: "EDIT",
-                    editID: item.eventKey,
+                    editID: flow,
                   })
                 }
               >
-                {item.label}
+                {flow}
               </ResponsiveNav.Item>
             ))}
           </ResponsiveNav>
@@ -191,6 +189,10 @@ export default function FlowHeader({ flows }: FlowHeaderProps) {
               label="Name"
               helperText="Required"
               autoComplete="off"
+              onKeyDown={(event: KeyboardEvent<HTMLInputElement>) => {
+                if (event.key === "Enter")
+                  addRenameHandler(addRenameOpen.editID);
+              }}
             />
           </Form>
         </AlertModal.Body>

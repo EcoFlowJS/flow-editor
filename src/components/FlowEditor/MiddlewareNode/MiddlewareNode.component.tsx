@@ -8,7 +8,14 @@ const MiddlewareNode = memo(
   ({ id, data, isConnectable, selected }: NodeProps) => {
     return (
       <>
-        <FlexboxGrid justify="center" align="middle" style={{ width: "100%" }}>
+        <FlexboxGrid
+          justify="center"
+          align="middle"
+          style={{ width: "100%" }}
+          onDoubleClick={() =>
+            data.openDrawer ? data.openDrawer(data.nodeID) : null
+          }
+        >
           <FlexboxGrid.Item>
             <div className={`node ${selected ? "selected" : ""}`}>
               <div className="node-icon-left">
