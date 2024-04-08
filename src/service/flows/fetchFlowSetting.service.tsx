@@ -2,8 +2,8 @@ import { ApiResponse } from "@ecoflow/types";
 import axios from "../../utils/axios/axios";
 import { AxiosError } from "axios";
 
-const getFlows = async (flowName?: string): Promise<ApiResponse> => {
-  const res = await axios.get(`flows${flowName ? `/id/${flowName}` : ""}`, {
+const fetchFlowSetting = async (): Promise<ApiResponse> => {
+  const res = await axios.get(`flows/settings`, {
     headers: { "Content-Type": "application/json" },
   });
 
@@ -11,4 +11,4 @@ const getFlows = async (flowName?: string): Promise<ApiResponse> => {
   else return res.data as ApiResponse;
 };
 
-export default getFlows;
+export default fetchFlowSetting;
