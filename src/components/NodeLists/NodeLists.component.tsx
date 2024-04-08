@@ -78,7 +78,7 @@ export default function NodeLists() {
                   {module.nodes.map((node, key) => (
                     <Nodes
                       key={key}
-                      nodeID={node.id}
+                      moduleID={node.id}
                       type={node.type}
                       label={node.name}
                     />

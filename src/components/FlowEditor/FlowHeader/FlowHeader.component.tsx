@@ -13,6 +13,8 @@ import flowEditorHandlers from "../../../hooks/flowEditorHandlers.hook";
 import { isEmpty, isUndefined } from "lodash";
 import { useSetAtom } from "jotai";
 import { errorNotification } from "../../../store/notification.store";
+import FlowEditorSettingsDropdownMenu from "./FlowEditorSettingsDropdownMenu/FlowEditorSettingsDropdownMenu.component";
+import { FaGears } from "react-icons/fa6";
 
 interface FlowHeaderProps {
   onFlowSelect?: (flowName: string) => void;
@@ -115,7 +117,7 @@ export default function FlowHeader({
         justify="space-between"
         align="middle"
       >
-        <FlexboxGrid.Item colspan={22}>
+        <FlexboxGrid.Item style={{ width: "calc(100vw - 200px - 80px)" }}>
           <ResponsiveNav
             className="flow-selector"
             removable={flows.length > 1}
@@ -145,8 +147,8 @@ export default function FlowHeader({
             ))}
           </ResponsiveNav>
         </FlexboxGrid.Item>
-        <FlexboxGrid.Item colspan={2}>
-          <FlexboxGrid justify="end">
+        <FlexboxGrid.Item style={{ width: 80 }}>
+          <FlexboxGrid justify="space-between">
             <FlexboxGrid.Item>
               <Whisper
                 placement="auto"
@@ -162,6 +164,19 @@ export default function FlowHeader({
                       mode: "ADD",
                     })
                   }
+                />
+              </Whisper>
+            </FlexboxGrid.Item>
+            <FlexboxGrid.Item>
+              <Whisper
+                placement="bottomEnd"
+                trigger="click"
+                enterable
+                speaker={FlowEditorSettingsDropdownMenu}
+              >
+                <IconButton
+                  appearance="subtle"
+                  icon={<IconWrapper icon={FaGears} />}
                 />
               </Whisper>
             </FlexboxGrid.Item>

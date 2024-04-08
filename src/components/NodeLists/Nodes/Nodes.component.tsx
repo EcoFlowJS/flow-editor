@@ -24,7 +24,7 @@ interface NodesProps
   color?: CSSProperties["backgroundColor"];
   onDragStart?: DragEventHandler<HTMLDivElement>;
   icon?: FC<HTMLAttributes<SVGElement>>;
-  nodeID: EcoModuleID;
+  moduleID: EcoModuleID;
   type?: ModuleTypes;
   label?: string;
 }
@@ -34,7 +34,7 @@ export default function Nodes({
   className,
   draggable,
   type = "Request",
-  nodeID,
+  moduleID,
   icon,
   label,
   onDragStart,
@@ -43,7 +43,7 @@ export default function Nodes({
   const onDragStartNodeHandler = (event: DragEvent<HTMLDivElement>) => {
     event.dataTransfer.setData(
       "application/ecoflow/nodes",
-      JSON.stringify({ nodeID, type, label })
+      JSON.stringify({ moduleID, type, label })
     );
     event.dataTransfer.effectAllowed = "move";
   };
