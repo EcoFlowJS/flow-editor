@@ -7,8 +7,9 @@ import {
   debugConsoleDrawer,
   flowEditorSettings,
 } from "../../../../store/flowEditor.store";
-import { FlowEditorSettingsConfigurations } from "@ecoflow/types";
+import { ApiResponse, FlowEditorSettingsConfigurations } from "@ecoflow/types";
 import { useState } from "react";
+import updateFlowSettings from "../../../../service/flows/updateFlowSettings.service";
 
 export default function FlowEditorSettingsDropdownMenu(
   {
@@ -25,28 +26,104 @@ export default function FlowEditorSettingsDropdownMenu(
   ref: React.RefCallback<HTMLElement>
 ) {
   const openDebugConsoleDrawer = useSetAtom(debugConsoleDrawer);
-  const [flowSettings, setFlowEditorSettings] = useAtom(flowEditorSettings);
-  const [isLoading, _setLoading] = useState<FlowEditorSettingsConfigurations>({
-    disabledkeyboard: false,
+  const [userFlowSettings, setUserFlowSettings] = useAtom(flowEditorSettings);
+  const [flowSettings, setFlowEditorSettings] =
+    useState<FlowEditorSettingsConfigurations>(userFlowSettings);
+  const [isLoading, setLoading] = useState<FlowEditorSettingsConfigurations>({
+    keyboardAccessibility: false,
     controls: false,
     miniMap: false,
     panMiniMap: false,
     scrollPan: false,
   });
+
+  const toggleHandler = (
+    key: keyof FlowEditorSettingsConfigurations,
+    value: boolean
+  ) => {
+    const flowEditorSettings = Object.create({});
+    const flowEditorLoading = Object.create({});
+    setFlowEditorSettings((flowSettings) => {
+      flowEditorSettings[key] = value;
+      return {
+        ...flowSettings,
+        ...flowEditorSettings,
+      };
+    });
+
+    setLoading((loadings) => {
+      flowEditorLoading[key] = true;
+      return {
+        ...loadings,
+        ...flowEditorLoading,
+      };
+    });
+
+    flowEditorSettings[key] = value;
+    updateFlowSettings({ ...flowEditorSettings }).then(
+      (response) => {
+        console.log(response);
+
+        setLoading((loadings) => {
+          flowEditorLoading[key] = false;
+          return {
+            ...loadings,
+            ...flowEditorLoading,
+          };
+        });
+        setFlowEditorSettings((flowSettings) => {
+          flowEditorSettings[key] = !value;
+          return {
+            ...flowSettings,
+            ...flowEditorSettings,
+          };
+        });
+
+        if (response.success)
+          setFlowEditorSettings((flowSettings) => {
+            flowEditorSettings[key] = response.payload[key];
+            setUserFlowSettings({
+              ...flowSettings,
+              ...flowEditorSettings,
+            });
+            return {
+              ...flowSettings,
+              ...flowEditorSettings,
+            };
+          });
+      },
+      (reject: ApiResponse) => {
+        setLoading((loadings) => {
+          flowEditorLoading[key] = false;
+          return {
+            ...loadings,
+            ...flowEditorLoading,
+          };
+        });
+        setFlowEditorSettings((flowSettings) => {
+          flowEditorSettings[key] = !value;
+          return {
+            ...flowSettings,
+            ...flowEditorSettings,
+          };
+        });
+
+        console.error(reject.payload);
+      }
+    );
+  };
+
   return (
     <Popover ref={ref} className={className} style={{ left, top }} full>
       <Dropdown.Menu>
         <Dropdown.Item>
           <Stack justifyContent="space-between" spacing={20}>
-            Disabled keyboard
+            keyboard Accessibility
             <Toggle
-              loading={isLoading.disabledkeyboard}
-              checked={flowSettings.disabledkeyboard}
+              loading={isLoading.keyboardAccessibility}
+              checked={flowSettings.keyboardAccessibility}
               onChange={(value) =>
-                setFlowEditorSettings({
-                  ...flowSettings,
-                  disabledkeyboard: value,
-                })
+                toggleHandler("keyboardAccessibility", value)
               }
             />
           </Stack>
@@ -57,12 +134,7 @@ export default function FlowEditorSettingsDropdownMenu(
             <Toggle
               loading={isLoading.controls}
               checked={flowSettings.controls}
-              onChange={(value) =>
-                setFlowEditorSettings({
-                  ...flowSettings,
-                  controls: value,
-                })
-              }
+              onChange={(value) => toggleHandler("controls", value)}
             />
           </Stack>
         </Dropdown.Item>
@@ -72,12 +144,7 @@ export default function FlowEditorSettingsDropdownMenu(
             <Toggle
               loading={isLoading.miniMap}
               checked={flowSettings.miniMap}
-              onChange={(value) =>
-                setFlowEditorSettings({
-                  ...flowSettings,
-                  miniMap: value,
-                })
-              }
+              onChange={(value) => toggleHandler("miniMap", value)}
             />
           </Stack>
         </Dropdown.Item>
@@ -87,12 +154,7 @@ export default function FlowEditorSettingsDropdownMenu(
             <Toggle
               loading={isLoading.panMiniMap}
               checked={flowSettings.panMiniMap}
-              onChange={(value) =>
-                setFlowEditorSettings({
-                  ...flowSettings,
-                  panMiniMap: value,
-                })
-              }
+              onChange={(value) => toggleHandler("panMiniMap", value)}
             />
           </Stack>
         </Dropdown.Item>
@@ -102,12 +164,7 @@ export default function FlowEditorSettingsDropdownMenu(
             <Toggle
               loading={isLoading.scrollPan}
               checked={flowSettings.scrollPan}
-              onChange={(value) =>
-                setFlowEditorSettings({
-                  ...flowSettings,
-                  scrollPan: value,
-                })
-              }
+              onChange={(value) => toggleHandler("scrollPan", value)}
             />
           </Stack>
         </Dropdown.Item>

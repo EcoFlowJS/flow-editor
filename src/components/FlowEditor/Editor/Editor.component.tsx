@@ -16,8 +16,11 @@ import ReactFlow, {
 import flowEditorHandlers from "../../../hooks/flowEditorHandlers.hook";
 import flowNodeTypes from "../../../defaults/flowNodeTypes.default";
 import { EcoModuleID, FlowsDataTypes } from "@ecoflow/types";
-import { useSetAtom } from "jotai";
-import { flowEditorConfigurationsDrawer } from "../../../store/flowEditor.store";
+import { useAtomValue, useSetAtom } from "jotai";
+import {
+  flowEditorConfigurationsDrawer,
+  flowEditorSettings,
+} from "../../../store/flowEditor.store";
 import ConfigurationDrawer from "../ConfigurationDrawer/ConfigurationDrawer.component";
 import "reactflow/dist/style.css";
 import "./style.less";
@@ -36,6 +39,7 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
   const [lastFlow, setLastFlow] = useState("");
   const [activeFlow, setActiveFlow] = useState("");
   const openDrawer = useSetAtom(flowEditorConfigurationsDrawer);
+  const flowSettings = useAtomValue(flowEditorSettings);
   const flowHandlers = flowEditorHandlers();
 
   const openConfigurationDrawer = (
@@ -195,9 +199,17 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
             zoomOnScroll={!disabled}
             panOnDrag={!disabled}
             deleteKeyCode="Delete"
+            disableKeyboardA11y={
+              !disabled && !flowSettings.keyboardAccessibility
+            }
+            panOnScroll={flowSettings.scrollPan}
           >
-            <MiniMap pannable={!disabled} />
-            <Controls />
+            {flowSettings.miniMap ? (
+              <MiniMap pannable={!disabled && flowSettings.panMiniMap} />
+            ) : (
+              <></>
+            )}
+            {flowSettings.controls ? <Controls /> : <></>}
             <Background color="#aaa" gap={20} />
           </ReactFlow>
         </ReactFlowProvider>

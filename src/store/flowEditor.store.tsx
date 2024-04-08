@@ -4,19 +4,16 @@ import {
   FlowsConfigurationsDrawer,
 } from "@ecoflow/types";
 import { atom } from "jotai";
+import defaultFlowEditorSettings from "../defaults/defaultFlowEditorSettings.default";
 
 const flowEditor = atom<FlowsConfigurations>({});
 const flowEditorConfigurationsDrawer = atom<FlowsConfigurationsDrawer>({
   show: false,
 });
 const debugConsoleDrawer = atom<boolean>(false);
-const flowEditorSettings = atom<FlowEditorSettingsConfigurations>({
-  disabledkeyboard: false,
-  controls: false,
-  miniMap: false,
-  panMiniMap: false,
-  scrollPan: false,
-});
+const flowEditorSettings = atom<FlowEditorSettingsConfigurations>(
+  defaultFlowEditorSettings
+);
 
 export {
   flowEditor,
