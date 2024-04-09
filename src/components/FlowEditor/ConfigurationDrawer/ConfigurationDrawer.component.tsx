@@ -2,13 +2,12 @@ import { useAtom } from "jotai";
 import {
   Divider,
   Drawer,
-  Heading,
-  HeadingGroup,
   IconButton,
   Input,
   Panel,
   Placeholder,
   Stack,
+  Tabs,
   Text,
   Tooltip,
   Whisper,
@@ -29,6 +28,11 @@ import { LuCircleOff, LuCircle } from "react-icons/lu";
 import { FaCheck } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import { HiTag } from "react-icons/hi";
+import { GrConfigure } from "react-icons/gr";
+import { MdOutlineDescription } from "react-icons/md";
+import { LiaObjectGroup } from "react-icons/lia";
+import NodeDescriptionTab from "./NodeDescriptionTab/NodeDescriptionTab.component";
+import NodeAppearanceTab from "./NodeAppearanceTab/NodeAppearanceTab.component";
 
 interface ConfigurationDrawerProps {
   onDrawerClosed?: (
@@ -225,30 +229,47 @@ export default function ConfigurationDrawer({
               </Stack.Item>
             </Stack>
           </Panel>
-          <Divider style={{ marginBottom: 0 }} />
-          {isLoading ? (
-            <Placeholder.Paragraph rows={10} rowHeight={10} />
-          ) : (
-            <Panel
-              bodyFill
-              header={
-                <HeadingGroup>
-                  <Heading level={3}>Configurations</Heading>
-                  <Text muted as="small">
-                    Configure your node configuration here.
-                  </Text>
-                </HeadingGroup>
-              }
+          <Divider />
+          <Tabs defaultActiveKey="configuration">
+            <Tabs.Tab
+              eventKey="configuration"
+              disabled={isLoading}
+              title="Configurations"
+              icon={<IconWrapper icon={GrConfigure} />}
             >
-              <div style={{ padding: "0 20px" }}>
-                {flowConfigurationDrawer.label}
-                <br />
-                {JSON.stringify(flowConfigurationDrawer.moduleID)}
-                <br />
-                {flowConfigurationDrawer.nodeID}
-              </div>
-            </Panel>
-          )}
+              {isLoading ? (
+                <Placeholder.Paragraph rows={10} rowHeight={10} />
+              ) : (
+                <Panel>
+                  {flowConfigurationDrawer.label}
+                  <br />
+                  {JSON.stringify(flowConfigurationDrawer.moduleID)}
+                  <br />
+                  {flowConfigurationDrawer.nodeID}
+                </Panel>
+              )}
+            </Tabs.Tab>
+            <Tabs.Tab
+              eventKey="description"
+              disabled={isLoading}
+              title="Description"
+              icon={<IconWrapper icon={MdOutlineDescription} />}
+            >
+              <Panel>
+                <NodeDescriptionTab />
+              </Panel>
+            </Tabs.Tab>
+            <Tabs.Tab
+              eventKey="appearance"
+              disabled={isLoading}
+              title="Appearance"
+              icon={<IconWrapper icon={LiaObjectGroup} />}
+            >
+              <Panel>
+                <NodeAppearanceTab />
+              </Panel>
+            </Tabs.Tab>
+          </Tabs>
         </Panel>
       </Drawer.Body>
     </Drawer>
