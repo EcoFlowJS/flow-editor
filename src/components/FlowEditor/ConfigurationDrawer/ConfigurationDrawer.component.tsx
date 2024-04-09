@@ -1,10 +1,29 @@
 import { useAtom } from "jotai";
-import { Button, Drawer } from "rsuite";
+import {
+  Divider,
+  Drawer,
+  Heading,
+  HeadingGroup,
+  IconButton,
+  Input,
+  Panel,
+  Placeholder,
+  Stack,
+  Text,
+  Tooltip,
+  Whisper,
+} from "rsuite";
 import { flowEditorConfigurationsDrawer } from "../../../store/flowEditor.store";
 import isUndefined from "lodash/isUndefined";
 import { useEffect, useState } from "react";
 import fetchNodes from "../../../service/nodes/fetchNodes.service";
-import { ApiResponse, Node } from "@ecoflow/types";
+import { ApiResponse, FlowsConfigurationsDrawer, Node } from "@ecoflow/types";
+import "./style.less";
+import { IconWrapper } from "@ecoflow/components-lib";
+import { LuCircleOff, LuCircle } from "react-icons/lu";
+import { FaCheck } from "react-icons/fa";
+import { FaXmark } from "react-icons/fa6";
+import { HiTag } from "react-icons/hi";
 
 interface ConfigurationDrawerProps {
   onDrawerClosed?: (
@@ -18,10 +37,20 @@ interface ConfigurationDrawerProps {
 export default function ConfigurationDrawer({
   onDrawerClosed = () => {},
 }: ConfigurationDrawerProps) {
+  const [isLoading, setLoading] = useState(true);
   const [flowConfigurationDrawer, setConfigurationDrawer] = useAtom(
     flowEditorConfigurationsDrawer
   );
-  const [nodeInputes, setNodeInputes] = useState<Node>(null);
+  const [moduleNode, setModuleNode] = useState<Node>(null);
+  const [nodeConfigurations, setNodeConfigurations] = useState<
+    Required<
+      Pick<FlowsConfigurationsDrawer, "label" | "configured" | "disabled">
+    >
+  >({
+    label: "",
+    configured: false,
+    disabled: false,
+  });
 
   const isOpen = (): boolean =>
     flowConfigurationDrawer.show &&
@@ -29,7 +58,7 @@ export default function ConfigurationDrawer({
     !isUndefined(flowConfigurationDrawer.moduleID) &&
     !isUndefined(flowConfigurationDrawer.nodeID);
 
-  const drawerClosedHandler = (
+  const updateNodeDetails = (
     label?: string | null,
     configured?: boolean | null,
     disabled?: boolean | null
@@ -47,18 +76,55 @@ export default function ConfigurationDrawer({
     );
   };
 
+  const drawerClosedHandler = (isClose?: boolean) => {
+    if (isClose) {
+      updateNodeDetails(
+        nodeConfigurations.label ? nodeConfigurations.label : moduleNode?.name,
+        true,
+        nodeConfigurations.disabled
+      );
+      return;
+    }
+    updateNodeDetails();
+  };
+
+  const updateNodeConfiguration = (
+    value: Pick<FlowsConfigurationsDrawer, "label" | "configured" | "disabled">
+  ) =>
+    setNodeConfigurations((nodeConfigurations) => {
+      return {
+        ...nodeConfigurations,
+        ...value,
+      };
+    });
+
   useEffect(() => {
     if (isOpen()) {
+      setLoading(true);
       fetchNodes(flowConfigurationDrawer.moduleID?._id).then(
         (response: ApiResponse) => {
-          if (response.success) setNodeInputes(response.payload);
+          setLoading(false);
+          if (response.success) {
+            setModuleNode(response.payload);
+            setNodeConfigurations({
+              label:
+                flowConfigurationDrawer.label === response.payload.name
+                  ? ""
+                  : flowConfigurationDrawer.label!,
+              configured: flowConfigurationDrawer.configured!,
+              disabled: flowConfigurationDrawer.disabled!,
+            });
+          }
         },
-        console.error
+        (reject: ApiResponse) => {
+          setLoading(false);
+          console.error(reject);
+        }
       );
     }
   }, [flowConfigurationDrawer]);
 
-  useEffect(() => console.log(nodeInputes), [nodeInputes]);
+  useEffect(() => console.log(moduleNode), [moduleNode]);
 
   return (
     <Drawer
@@ -69,42 +135,97 @@ export default function ConfigurationDrawer({
       <Drawer.Header>
         <Drawer.Title>Node Configurations</Drawer.Title>
         <Drawer.Actions>
-          <Button
-            appearance="primary"
-            color="red"
-            style={{ minWidth: 80 }}
-            onClick={() => drawerClosedHandler()}
+          <Whisper
+            placement="bottom"
+            speaker={<Tooltip arrow={false}>Enable/Diable Node</Tooltip>}
           >
-            Cancel
-          </Button>
-          <Button
-            appearance="primary"
-            style={{ minWidth: 80 }}
-            onClick={() => drawerClosedHandler("axy", true)}
+            <IconButton
+              appearance="primary"
+              color="cyan"
+              icon={
+                <IconWrapper
+                  icon={nodeConfigurations.disabled ? LuCircleOff : LuCircle}
+                />
+              }
+              onClick={() =>
+                updateNodeConfiguration({
+                  disabled: !nodeConfigurations.disabled,
+                })
+              }
+            >
+              {nodeConfigurations.disabled ? "Diabled" : "Enabled"}
+            </IconButton>
+          </Whisper>
+          <Whisper
+            placement="bottom"
+            speaker={<Tooltip arrow={false}>Cancel</Tooltip>}
           >
-            Confirm
-          </Button>
-          <Button
-            appearance="primary"
-            style={{ minWidth: 80 }}
-            onClick={() => {
-              drawerClosedHandler(
-                null,
-                null,
-                !flowConfigurationDrawer.disabled!
-              );
-            }}
+            <IconButton
+              appearance="primary"
+              color="red"
+              icon={<IconWrapper icon={FaXmark} />}
+              onClick={() => drawerClosedHandler()}
+            />
+          </Whisper>
+          <Whisper
+            placement="bottom"
+            speaker={<Tooltip arrow={false}>Confirm</Tooltip>}
           >
-            Confirm
-          </Button>
+            <IconButton
+              appearance="primary"
+              color="green"
+              icon={<IconWrapper icon={FaCheck} />}
+              onClick={() => drawerClosedHandler(true)}
+            />
+          </Whisper>
         </Drawer.Actions>
       </Drawer.Header>
-      <Drawer.Body>
-        {flowConfigurationDrawer.label}
-        <br />
-        {JSON.stringify(flowConfigurationDrawer.moduleID)}
-        <br />
-        {flowConfigurationDrawer.nodeID}
+      <Drawer.Body className="flow-configuration-drawer">
+        <Panel bodyFill>
+          <Panel bodyFill>
+            <Stack spacing={35}>
+              <Text size="lg">
+                <IconWrapper icon={HiTag} /> Name :
+              </Text>
+              <Stack.Item grow={1}>
+                <Input
+                  id="nodename"
+                  autoComplete="off"
+                  disabled={isLoading}
+                  placeholder={moduleNode?.name}
+                  value={nodeConfigurations.label}
+                  onChange={(value: string) =>
+                    updateNodeConfiguration({ label: value })
+                  }
+                />
+              </Stack.Item>
+            </Stack>
+          </Panel>
+          <Divider style={{ marginBottom: 0 }} />
+          {isLoading ? (
+            <Placeholder.Paragraph rows={10} rowHeight={10} />
+          ) : (
+            <Panel
+              bodyFill
+              header={
+                <HeadingGroup>
+                  <Heading level={3}>Configurations</Heading>
+                  <Text muted as="small">
+                    Configure your node configuration here.
+                  </Text>
+                </HeadingGroup>
+              }
+            >
+              <div style={{ padding: "0 20px" }}>
+                {flowConfigurationDrawer.label}
+                <br />
+                {JSON.stringify(flowConfigurationDrawer.moduleID)}
+                <br />
+                {flowConfigurationDrawer.nodeID}
+              </div>
+            </Panel>
+          )}
+        </Panel>
       </Drawer.Body>
     </Drawer>
   );

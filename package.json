@@ -14,10 +14,7 @@
   "dependencies": {
     "@ecoflow/components-lib": "^0.1.0",
     "@ecoflow/types": "^0.0.1",
-    "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.11.5",
     "@koa/router": "^11.0.2",
-    "@mui/material": "^5.15.14",
     "@rsuite/responsive-nav": "^5.0.1",
     "axios": "^1.6.8",
     "jotai": "^2.7.1",
@@ -32,7 +29,7 @@
     "react-icons": "^5.0.1",
     "react-router-dom": "^6.22.3",
     "reactflow": "^11.10.4",
-    "rsuite": "^5.53.0",
+    "rsuite": "^5.59.0",
     "socket.io-client": "^4.7.5"
   },
   "devDependencies": {
