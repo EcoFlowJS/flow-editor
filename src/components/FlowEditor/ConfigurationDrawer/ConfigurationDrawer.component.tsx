@@ -115,7 +115,10 @@ export default function ConfigurationDrawer({
   };
 
   const updateNodeConfiguration = (
-    value: Pick<FlowsConfigurationsDrawer, "label" | "configured" | "disabled">
+    value: Pick<
+      FlowsConfigurationsDrawer,
+      "label" | "configured" | "disabled" | "description" | "appearance"
+    >
   ) =>
     setNodeConfigurations((nodeConfigurations) => {
       return {
@@ -230,46 +233,59 @@ export default function ConfigurationDrawer({
             </Stack>
           </Panel>
           <Divider />
-          <Tabs defaultActiveKey="configuration">
-            <Tabs.Tab
-              eventKey="configuration"
-              disabled={isLoading}
-              title="Configurations"
-              icon={<IconWrapper icon={GrConfigure} />}
+          {isLoading ? (
+            <Placeholder.Paragraph rows={10} rowHeight={10} />
+          ) : (
+            <Tabs
+              defaultActiveKey={
+                moduleNode?.inputs ? "configuration" : "description"
+              }
             >
-              {isLoading ? (
-                <Placeholder.Paragraph rows={10} rowHeight={10} />
+              {moduleNode?.inputs ? (
+                <Tabs.Tab
+                  eventKey="configuration"
+                  disabled={isLoading}
+                  title="Configurations"
+                  icon={<IconWrapper icon={GrConfigure} />}
+                >
+                  <Panel>
+                    {flowConfigurationDrawer.label}
+                    <br />
+                    {JSON.stringify(flowConfigurationDrawer.moduleID)}
+                    <br />
+                    {flowConfigurationDrawer.nodeID}
+                  </Panel>
+                </Tabs.Tab>
               ) : (
-                <Panel>
-                  {flowConfigurationDrawer.label}
-                  <br />
-                  {JSON.stringify(flowConfigurationDrawer.moduleID)}
-                  <br />
-                  {flowConfigurationDrawer.nodeID}
-                </Panel>
+                <></>
               )}
-            </Tabs.Tab>
-            <Tabs.Tab
-              eventKey="description"
-              disabled={isLoading}
-              title="Description"
-              icon={<IconWrapper icon={MdOutlineDescription} />}
-            >
-              <Panel>
-                <NodeDescriptionTab />
-              </Panel>
-            </Tabs.Tab>
-            <Tabs.Tab
-              eventKey="appearance"
-              disabled={isLoading}
-              title="Appearance"
-              icon={<IconWrapper icon={LiaObjectGroup} />}
-            >
-              <Panel>
-                <NodeAppearanceTab />
-              </Panel>
-            </Tabs.Tab>
-          </Tabs>
+              <Tabs.Tab
+                eventKey="description"
+                disabled={isLoading}
+                title="Description"
+                icon={<IconWrapper icon={MdOutlineDescription} />}
+              >
+                <Panel bodyFill style={{ paddingTop: 20 }}>
+                  <NodeDescriptionTab
+                    text={nodeConfigurations.description}
+                    onChange={(value) =>
+                      updateNodeConfiguration({ description: value })
+                    }
+                  />
+                </Panel>
+              </Tabs.Tab>
+              <Tabs.Tab
+                eventKey="appearance"
+                disabled={isLoading}
+                title="Appearance"
+                icon={<IconWrapper icon={LiaObjectGroup} />}
+              >
+                <Panel>
+                  <NodeAppearanceTab />
+                </Panel>
+              </Tabs.Tab>
+            </Tabs>
+          )}
         </Panel>
       </Drawer.Body>
     </Drawer>
