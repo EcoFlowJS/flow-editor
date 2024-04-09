@@ -281,7 +281,13 @@ export default function ConfigurationDrawer({
                 icon={<IconWrapper icon={LiaObjectGroup} />}
               >
                 <Panel>
-                  <NodeAppearanceTab />
+                  <NodeAppearanceTab
+                    values={nodeConfigurations.appearance}
+                    type={moduleNode?.type}
+                    onChange={(value) =>
+                      updateNodeConfiguration({ appearance: value })
+                    }
+                  />
                 </Panel>
               </Tabs.Tab>
             </Tabs>

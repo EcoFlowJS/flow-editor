@@ -6,6 +6,7 @@ import { TbRouteSquare2 } from "react-icons/tb";
 import { FlowsDataTypes } from "@ecoflow/types";
 import isUndefined from "lodash/isUndefined";
 import isEmpty from "lodash/isEmpty";
+import iconFetcher from "../../../helper/iconFetcher";
 
 const RequestNode = memo(
   ({ id, data, isConnectable, selected }: NodeProps<FlowsDataTypes>) => {
@@ -58,7 +59,7 @@ const RequestNode = memo(
                       <IconWrapper
                         icon={
                           appearance.icon
-                            ? appearance.icon
+                            ? iconFetcher[appearance.icon]
                             : icon
                             ? icon
                             : TbRouteSquare2
@@ -138,7 +139,7 @@ const RequestNode = memo(
                       <IconWrapper
                         icon={
                           appearance.icon
-                            ? appearance.icon
+                            ? iconFetcher[appearance.icon]
                             : icon
                             ? icon
                             : TbRouteSquare2
