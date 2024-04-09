@@ -79,9 +79,13 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
   const onDrop = useCallback(
     (event: DragEvent<HTMLDivElement>) => {
       event.preventDefault();
-      const { moduleID, type, label } = JSON.parse(
-        event.dataTransfer.getData("application/ecoflow/nodes")
-      );
+      const {
+        moduleID,
+        type,
+        label,
+        configured: _c, //need to add this
+        isOpenDrawer: _a, //need to add this
+      } = JSON.parse(event.dataTransfer.getData("application/ecoflow/nodes"));
 
       if (typeof type === "undefined" || !type) return;
 

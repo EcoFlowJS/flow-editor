@@ -8,7 +8,7 @@ import {
   flowEditorSettings,
 } from "../../../../store/flowEditor.store";
 import { ApiResponse, FlowEditorSettingsConfigurations } from "@ecoflow/types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import updateFlowSettings from "../../../../service/flows/updateFlowSettings.service";
 
 export default function FlowEditorSettingsDropdownMenu(
@@ -28,6 +28,8 @@ export default function FlowEditorSettingsDropdownMenu(
   const openDebugConsoleDrawer = useSetAtom(debugConsoleDrawer);
   const [userFlowSettings, setUserFlowSettings] = useAtom(flowEditorSettings);
   const [flowSettings, setFlowEditorSettings] =
+    useState<FlowEditorSettingsConfigurations>(userFlowSettings);
+  const [flowSettingsUpdated, setFlowSettingsUpdated] =
     useState<FlowEditorSettingsConfigurations>(userFlowSettings);
   const [isLoading, setLoading] = useState<FlowEditorSettingsConfigurations>({
     keyboardAccessibility: false,
@@ -62,8 +64,6 @@ export default function FlowEditorSettingsDropdownMenu(
     flowEditorSettings[key] = value;
     updateFlowSettings({ ...flowEditorSettings }).then(
       (response) => {
-        console.log(response);
-
         setLoading((loadings) => {
           flowEditorLoading[key] = false;
           return {
@@ -82,9 +82,11 @@ export default function FlowEditorSettingsDropdownMenu(
         if (response.success)
           setFlowEditorSettings((flowSettings) => {
             flowEditorSettings[key] = response.payload[key];
-            setUserFlowSettings({
-              ...flowSettings,
-              ...flowEditorSettings,
+            setFlowSettingsUpdated((flowSettings) => {
+              return {
+                ...flowSettings,
+                ...flowEditorSettings,
+              };
             });
             return {
               ...flowSettings,
@@ -112,6 +114,11 @@ export default function FlowEditorSettingsDropdownMenu(
       }
     );
   };
+
+  useEffect(
+    () => setUserFlowSettings(flowSettingsUpdated),
+    [flowSettingsUpdated]
+  );
 
   return (
     <Popover ref={ref} className={className} style={{ left, top }} full>
