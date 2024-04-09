@@ -200,8 +200,6 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
     });
   }, [activeFlow]);
 
-  useEffect(() => console.log(nodes), [nodes]);
-
   return (
     <>
       <div

@@ -6,6 +6,7 @@ import { Handle, NodeProps, Position } from "reactflow";
 import { Badge, FlexboxGrid, Text, Tooltip, Whisper } from "rsuite";
 import isUndefined from "lodash/isUndefined";
 import isEmpty from "lodash/isEmpty";
+import iconFetcher from "../../../helper/iconFetcher";
 
 const DebugNode = memo(
   ({ id, data, isConnectable, selected }: NodeProps<FlowsDataTypes>) => {
@@ -68,7 +69,7 @@ const DebugNode = memo(
                       <IconWrapper
                         icon={
                           appearance.icon
-                            ? appearance.icon
+                            ? iconFetcher[appearance.icon]
                             : icon
                             ? icon
                             : CgDebug
@@ -153,7 +154,7 @@ const DebugNode = memo(
                       <IconWrapper
                         icon={
                           appearance.icon
-                            ? appearance.icon
+                            ? iconFetcher[appearance.icon]
                             : icon
                             ? icon
                             : CgDebug
