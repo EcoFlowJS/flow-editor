@@ -3,11 +3,21 @@ import { FlowsDataTypes } from "@ecoflow/types";
 import { memo } from "react";
 import { GiServerRack } from "react-icons/gi";
 import { Handle, NodeProps, Position } from "reactflow";
-import { Badge, FlexboxGrid } from "rsuite";
+import { Badge, FlexboxGrid, Text, Tooltip, Whisper } from "rsuite";
+import isUndefined from "lodash/isUndefined";
+import isEmpty from "lodash/isEmpty";
 
 const MiddlewareNode = memo(
   ({ id, data, isConnectable, selected }: NodeProps<FlowsDataTypes>) => {
-    const { label, icon, configured, disabled, openDrawer } = data;
+    const {
+      label,
+      icon,
+      configured,
+      disabled,
+      description,
+      appearance,
+      openDrawer,
+    } = data;
     return (
       <>
         {configured ? (
@@ -17,7 +27,15 @@ const MiddlewareNode = memo(
               align="middle"
               style={{ width: "100%" }}
               onDoubleClick={() =>
-                openDrawer ? openDrawer(label, configured, disabled) : null
+                openDrawer
+                  ? openDrawer(
+                      label,
+                      configured,
+                      disabled,
+                      description,
+                      appearance
+                    )
+                  : null
               }
             >
               <FlexboxGrid.Item>
@@ -25,6 +43,11 @@ const MiddlewareNode = memo(
                   className={`node ${selected ? "selected" : ""} ${
                     disabled ? "flow-node-disabled" : ""
                   }`}
+                  style={
+                    !isUndefined(appearance.label) && !appearance.label
+                      ? { width: 30, height: 30 }
+                      : { width: 130, height: 30 }
+                  }
                 >
                   <div className="node-icon-left">
                     <FlexboxGrid
@@ -32,25 +55,76 @@ const MiddlewareNode = memo(
                       align="middle"
                       style={{ height: "100%" }}
                     >
-                      <IconWrapper icon={icon ? icon : GiServerRack} />
+                      <IconWrapper
+                        icon={
+                          appearance.icon
+                            ? appearance.icon
+                            : icon
+                            ? icon
+                            : GiServerRack
+                        }
+                      />
                     </FlexboxGrid>
                   </div>
-                  <div className="node-label">{label}</div>
+                  {!isUndefined(appearance.label) && appearance.label ? (
+                    <div className="node-label">{label}</div>
+                  ) : (
+                    <></>
+                  )}
                 </div>
               </FlexboxGrid.Item>
             </FlexboxGrid>
-            <Handle
-              type="target"
-              position={Position.Left}
-              id={`${id}-target`}
-              isConnectable={isConnectable}
-            />
-            <Handle
-              type="source"
-              position={Position.Right}
-              id={`${id}-source`}
-              isConnectable={isConnectable}
-            />
+            {!isUndefined(appearance.portLabel?.input) &&
+            !isEmpty(appearance.portLabel.input) ? (
+              <Whisper
+                placement="left"
+                speaker={
+                  <Tooltip arrow={true}>
+                    <Text size="lg">{appearance.portLabel.input}</Text>
+                  </Tooltip>
+                }
+              >
+                <Handle
+                  type="target"
+                  position={Position.Left}
+                  id={`${id}-target`}
+                  isConnectable={isConnectable}
+                />
+              </Whisper>
+            ) : (
+              <Handle
+                type="target"
+                position={Position.Left}
+                id={`${id}-target`}
+                isConnectable={isConnectable}
+              />
+            )}
+
+            {!isUndefined(appearance.portLabel?.output) &&
+            !isEmpty(appearance.portLabel.output) ? (
+              <Whisper
+                placement="right"
+                speaker={
+                  <Tooltip arrow={true}>
+                    <Text size="lg">{appearance.portLabel.output}</Text>
+                  </Tooltip>
+                }
+              >
+                <Handle
+                  type="source"
+                  position={Position.Right}
+                  id={`${id}-source`}
+                  isConnectable={isConnectable}
+                />
+              </Whisper>
+            ) : (
+              <Handle
+                type="source"
+                position={Position.Right}
+                id={`${id}-source`}
+                isConnectable={isConnectable}
+              />
+            )}
           </>
         ) : (
           <Badge color="orange">
@@ -59,7 +133,15 @@ const MiddlewareNode = memo(
               align="middle"
               style={{ width: "100%" }}
               onDoubleClick={() =>
-                openDrawer ? openDrawer(label, configured, disabled) : null
+                openDrawer
+                  ? openDrawer(
+                      label,
+                      configured,
+                      disabled,
+                      description,
+                      appearance
+                    )
+                  : null
               }
             >
               <FlexboxGrid.Item>
@@ -67,6 +149,11 @@ const MiddlewareNode = memo(
                   className={`node ${selected ? "selected" : ""} ${
                     disabled ? "flow-node-disabled" : ""
                   }`}
+                  style={
+                    !isUndefined(appearance.label) && !appearance.label
+                      ? { width: 30, height: 30 }
+                      : { width: 130, height: 30 }
+                  }
                 >
                   <div className="node-icon-left">
                     <FlexboxGrid
@@ -74,25 +161,77 @@ const MiddlewareNode = memo(
                       align="middle"
                       style={{ height: "100%" }}
                     >
-                      <IconWrapper icon={icon ? icon : GiServerRack} />
+                      <IconWrapper
+                        icon={
+                          appearance.icon
+                            ? appearance.icon
+                            : icon
+                            ? icon
+                            : GiServerRack
+                        }
+                      />
                     </FlexboxGrid>
                   </div>
-                  <div className="node-label">{label}</div>
+                  {!isUndefined(appearance.label) && appearance.label ? (
+                    <div className="node-label">{label}</div>
+                  ) : (
+                    <></>
+                  )}
                 </div>
               </FlexboxGrid.Item>
             </FlexboxGrid>
-            <Handle
-              type="target"
-              position={Position.Left}
-              id={`${id}-target`}
-              isConnectable={isConnectable}
-            />
-            <Handle
-              type="source"
-              position={Position.Right}
-              id={`${id}-source`}
-              isConnectable={isConnectable}
-            />
+
+            {!isUndefined(appearance.portLabel?.input) &&
+            !isEmpty(appearance.portLabel.input) ? (
+              <Whisper
+                placement="left"
+                speaker={
+                  <Tooltip arrow={true}>
+                    <Text size="lg">{appearance.portLabel.input}</Text>
+                  </Tooltip>
+                }
+              >
+                <Handle
+                  type="target"
+                  position={Position.Left}
+                  id={`${id}-target`}
+                  isConnectable={isConnectable}
+                />
+              </Whisper>
+            ) : (
+              <Handle
+                type="target"
+                position={Position.Left}
+                id={`${id}-target`}
+                isConnectable={isConnectable}
+              />
+            )}
+
+            {!isUndefined(appearance.portLabel?.output) &&
+            !isEmpty(appearance.portLabel.output) ? (
+              <Whisper
+                placement="right"
+                speaker={
+                  <Tooltip arrow={true}>
+                    <Text size="lg">{appearance.portLabel.output}</Text>
+                  </Tooltip>
+                }
+              >
+                <Handle
+                  type="source"
+                  position={Position.Right}
+                  id={`${id}-source`}
+                  isConnectable={isConnectable}
+                />
+              </Whisper>
+            ) : (
+              <Handle
+                type="source"
+                position={Position.Right}
+                id={`${id}-source`}
+                isConnectable={isConnectable}
+              />
+            )}
           </Badge>
         )}
       </>

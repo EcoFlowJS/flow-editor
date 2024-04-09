@@ -15,7 +15,11 @@ import ReactFlow, {
 } from "reactflow";
 import flowEditorHandlers from "../../../hooks/flowEditorHandlers.hook";
 import flowNodeTypes from "../../../defaults/flowNodeTypes.default";
-import { EcoModuleID, FlowsDataTypes } from "@ecoflow/types";
+import {
+  EcoModuleID,
+  FlowsDataTypes,
+  NodeAppearanceConfigurations,
+} from "@ecoflow/types";
 import { useAtomValue, useSetAtom } from "jotai";
 import {
   flowEditorConfigurationsDrawer,
@@ -24,6 +28,7 @@ import {
 import ConfigurationDrawer from "../ConfigurationDrawer/ConfigurationDrawer.component";
 import "reactflow/dist/style.css";
 import "./style.less";
+import defaultNodeAppearance from "../../../defaults/defaultNodeAppearance.default";
 
 interface EditorProps {
   flow?: string;
@@ -47,9 +52,20 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
     moduleID: EcoModuleID,
     label: string,
     configured: boolean,
-    disabled: boolean
+    disabled: boolean,
+    description: string,
+    appearance: NodeAppearanceConfigurations
   ) =>
-    openDrawer({ show: true, nodeID, moduleID, label, configured, disabled });
+    openDrawer({
+      show: true,
+      nodeID,
+      moduleID,
+      label,
+      configured,
+      disabled,
+      description,
+      appearance,
+    });
 
   const onConnect = useCallback(
     (connections: Edge | Connection) =>
@@ -79,13 +95,9 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
   const onDrop = useCallback(
     (event: DragEvent<HTMLDivElement>) => {
       event.preventDefault();
-      const {
-        moduleID,
-        type,
-        label,
-        configured: _c, //need to add this
-        isOpenDrawer: _a, //need to add this
-      } = JSON.parse(event.dataTransfer.getData("application/ecoflow/nodes"));
+      const { moduleID, type, label, configured } = JSON.parse(
+        event.dataTransfer.getData("application/ecoflow/nodes")
+      );
 
       if (typeof type === "undefined" || !type) return;
 
@@ -101,15 +113,25 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
         data: {
           moduleID,
           label,
-          configured: false,
+          configured,
           disabled: false,
-          openDrawer: (label: string, configured: boolean, disabled: boolean) =>
+          description: "",
+          appearance: defaultNodeAppearance,
+          openDrawer: (
+            label: string,
+            configured: boolean,
+            disabled: boolean,
+            description: string,
+            appearance: NodeAppearanceConfigurations
+          ) =>
             openConfigurationDrawer(
               nodeID,
               moduleID,
               label,
               configured,
-              disabled
+              disabled,
+              description,
+              appearance
             ),
         },
       };
@@ -123,16 +145,20 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
     nodeID: string,
     label: string,
     configured: boolean,
-    disabled: boolean
+    disabled: boolean,
+    description: string,
+    appearance: NodeAppearanceConfigurations
   ) => {
     setNodes((nodes) => {
       const updatedNodes = nodes.map((node) => {
         if (node.id === nodeID)
           node.data = {
             ...node.data,
-            label: label,
+            label,
             configured,
             disabled,
+            description,
+            appearance,
           };
         return node;
       });
@@ -173,6 +199,8 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
       configurations: [],
     });
   }, [activeFlow]);
+
+  useEffect(() => console.log(nodes), [nodes]);
 
   return (
     <>

@@ -81,6 +81,7 @@ export default function NodeLists() {
                       moduleID={node.id}
                       type={node.type}
                       label={node.name}
+                      isInputsAvailable={node.inputs ? node.inputs.length : 0}
                     />
                   ))}
                 </Nav.Menu>

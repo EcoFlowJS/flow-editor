@@ -1,15 +1,50 @@
 import { IconWrapper } from "@ecoflow/components-lib";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { LuSquareStack } from "react-icons/lu";
-import { NodeProps, Position } from "reactflow";
-import { Badge, FlexboxGrid } from "rsuite";
-import NodeTargetHandler from "./NodeTargetHandler/NodeTargetHandler.component";
+import {
+  Handle,
+  NodeProps,
+  Position,
+  ReactFlowState,
+  getConnectedEdges,
+  useNodeId,
+  useStore,
+} from "reactflow";
+import { Badge, FlexboxGrid, Text, Tooltip, Whisper } from "rsuite";
 import { FlowsDataTypes } from "@ecoflow/types";
+import isUndefined from "lodash/isUndefined";
+import isEmpty from "lodash/isEmpty";
+
+const selector = (s: ReactFlowState) => ({
+  nodeInternals: s.nodeInternals,
+  edges: s.edges,
+});
 
 const ResponseNode = memo(
   ({ id, data, selected }: NodeProps<FlowsDataTypes>) => {
-    const { label, icon, configured, isConnectable, disabled, openDrawer } =
-      data;
+    const {
+      label,
+      icon,
+      configured,
+      isConnectable,
+      disabled,
+      description,
+      appearance,
+      openDrawer,
+    } = data;
+
+    const { nodeInternals, edges } = useStore(selector);
+    const nodeId = useNodeId();
+
+    const isHandleConnectable = useMemo(() => {
+      const node = nodeInternals.get(nodeId!);
+      const connectedEdges = getConnectedEdges([node!], edges);
+
+      return (
+        connectedEdges.length <
+        (typeof isConnectable === "number" ? isConnectable : 1)
+      );
+    }, [nodeInternals, edges, nodeId, isConnectable]);
     return (
       <>
         {configured ? (
@@ -19,7 +54,15 @@ const ResponseNode = memo(
               align="middle"
               style={{ width: "100%" }}
               onDoubleClick={() =>
-                openDrawer ? openDrawer(label, configured, disabled) : null
+                openDrawer
+                  ? openDrawer(
+                      label,
+                      configured,
+                      disabled,
+                      description,
+                      appearance
+                    )
+                  : null
               }
             >
               <FlexboxGrid.Item>
@@ -27,31 +70,67 @@ const ResponseNode = memo(
                   className={`node ${selected ? "selected" : ""} ${
                     disabled ? "flow-node-disabled" : ""
                   }`}
+                  style={
+                    !isUndefined(appearance.label) && !appearance.label
+                      ? { width: 30, height: 30 }
+                      : { width: 130, height: 30 }
+                  }
                 >
-                  <div
-                    className="node-label"
-                    style={{ padding: "5px 35px 5px 10px" }}
-                  >
-                    {label}
-                  </div>
+                  {!isUndefined(appearance.label) && appearance.label ? (
+                    <div
+                      className="node-label"
+                      style={{ padding: "5px 35px 5px 10px" }}
+                    >
+                      {label}
+                    </div>
+                  ) : (
+                    <></>
+                  )}
                   <div className="node-icon-right">
                     <FlexboxGrid
                       justify="center"
                       align="middle"
                       style={{ height: "100%" }}
                     >
-                      <IconWrapper icon={icon ? icon : LuSquareStack} />
+                      <IconWrapper
+                        icon={
+                          appearance.icon
+                            ? appearance.icon
+                            : icon
+                            ? icon
+                            : LuSquareStack
+                        }
+                      />
                     </FlexboxGrid>
                   </div>
                 </div>
               </FlexboxGrid.Item>
             </FlexboxGrid>
-            <NodeTargetHandler
-              type="target"
-              position={Position.Left}
-              id={`${id}-target`}
-              isConnectable={isConnectable ? isConnectable : 1}
-            />
+            {!isUndefined(appearance.portLabel?.input) &&
+            !isEmpty(appearance.portLabel.input) ? (
+              <Whisper
+                placement="left"
+                speaker={
+                  <Tooltip arrow={true}>
+                    <Text size="lg">{appearance.portLabel.input}</Text>
+                  </Tooltip>
+                }
+              >
+                <Handle
+                  type="target"
+                  position={Position.Left}
+                  id={`${id}-target`}
+                  isConnectable={isHandleConnectable}
+                />
+              </Whisper>
+            ) : (
+              <Handle
+                type="target"
+                position={Position.Left}
+                id={`${id}-target`}
+                isConnectable={isHandleConnectable}
+              />
+            )}
           </>
         ) : (
           <Badge color="orange">
@@ -60,7 +139,15 @@ const ResponseNode = memo(
               align="middle"
               style={{ width: "100%" }}
               onDoubleClick={() =>
-                openDrawer ? openDrawer(label, configured, disabled) : null
+                openDrawer
+                  ? openDrawer(
+                      label,
+                      configured,
+                      disabled,
+                      description,
+                      appearance
+                    )
+                  : null
               }
             >
               <FlexboxGrid.Item>
@@ -68,31 +155,67 @@ const ResponseNode = memo(
                   className={`node ${selected ? "selected" : ""} ${
                     disabled ? "flow-node-disabled" : ""
                   }`}
+                  style={
+                    !isUndefined(appearance.label) && !appearance.label
+                      ? { width: 30, height: 30 }
+                      : { width: 130, height: 30 }
+                  }
                 >
-                  <div
-                    className="node-label"
-                    style={{ padding: "5px 35px 5px 10px" }}
-                  >
-                    {label}
-                  </div>
+                  {!isUndefined(appearance.label) && appearance.label ? (
+                    <div
+                      className="node-label"
+                      style={{ padding: "5px 35px 5px 10px" }}
+                    >
+                      {label}
+                    </div>
+                  ) : (
+                    <></>
+                  )}
                   <div className="node-icon-right">
                     <FlexboxGrid
                       justify="center"
                       align="middle"
                       style={{ height: "100%" }}
                     >
-                      <IconWrapper icon={icon ? icon : LuSquareStack} />
+                      <IconWrapper
+                        icon={
+                          appearance.icon
+                            ? appearance.icon
+                            : icon
+                            ? icon
+                            : LuSquareStack
+                        }
+                      />
                     </FlexboxGrid>
                   </div>
                 </div>
               </FlexboxGrid.Item>
             </FlexboxGrid>
-            <NodeTargetHandler
-              type="target"
-              position={Position.Left}
-              id={`${id}-target`}
-              isConnectable={isConnectable ? isConnectable : 1}
-            />
+            {!isUndefined(appearance.portLabel?.input) &&
+            !isEmpty(appearance.portLabel.input) ? (
+              <Whisper
+                placement="left"
+                speaker={
+                  <Tooltip arrow={true}>
+                    <Text size="lg">{appearance.portLabel.input}</Text>
+                  </Tooltip>
+                }
+              >
+                <Handle
+                  type="target"
+                  position={Position.Left}
+                  id={`${id}-target`}
+                  isConnectable={isHandleConnectable}
+                />
+              </Whisper>
+            ) : (
+              <Handle
+                type="target"
+                position={Position.Left}
+                id={`${id}-target`}
+                isConnectable={isHandleConnectable}
+              />
+            )}
           </Badge>
         )}
       </>

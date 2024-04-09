@@ -27,6 +27,7 @@ interface NodesProps
   moduleID: EcoModuleID;
   type?: ModuleTypes;
   label?: string;
+  isInputsAvailable?: number;
 }
 
 export default function Nodes({
@@ -37,13 +38,21 @@ export default function Nodes({
   moduleID,
   icon,
   label,
+  isInputsAvailable,
   onDragStart,
   ...props
 }: NodesProps) {
   const onDragStartNodeHandler = (event: DragEvent<HTMLDivElement>) => {
     event.dataTransfer.setData(
       "application/ecoflow/nodes",
-      JSON.stringify({ moduleID, type, label })
+      JSON.stringify({
+        moduleID,
+        type,
+        label,
+        ...(isInputsAvailable && isInputsAvailable > 0
+          ? { configured: false }
+          : { configured: true }),
+      })
     );
     event.dataTransfer.effectAllowed = "move";
   };
