@@ -17,7 +17,12 @@ import { flowEditorConfigurationsDrawer } from "../../../store/flowEditor.store"
 import isUndefined from "lodash/isUndefined";
 import { useEffect, useState } from "react";
 import fetchNodes from "../../../service/nodes/fetchNodes.service";
-import { ApiResponse, FlowsConfigurationsDrawer, Node } from "@ecoflow/types";
+import {
+  ApiResponse,
+  FlowsConfigurationsDrawer,
+  Node,
+  NodeAppearanceConfigurations,
+} from "@ecoflow/types";
 import "./style.less";
 import { IconWrapper } from "@ecoflow/components-lib";
 import { LuCircleOff, LuCircle } from "react-icons/lu";
@@ -30,7 +35,9 @@ interface ConfigurationDrawerProps {
     nodeID: string,
     label: string,
     configured: boolean,
-    disabled: boolean
+    disabled: boolean,
+    description: string,
+    appearance: NodeAppearanceConfigurations
   ) => void;
 }
 
@@ -44,12 +51,17 @@ export default function ConfigurationDrawer({
   const [moduleNode, setModuleNode] = useState<Node>(null);
   const [nodeConfigurations, setNodeConfigurations] = useState<
     Required<
-      Pick<FlowsConfigurationsDrawer, "label" | "configured" | "disabled">
+      Pick<
+        FlowsConfigurationsDrawer,
+        "label" | "configured" | "disabled" | "description" | "appearance"
+      >
     >
   >({
     label: "",
     configured: false,
     disabled: false,
+    description: "",
+    appearance: {},
   });
 
   const isOpen = (): boolean =>
@@ -61,7 +73,9 @@ export default function ConfigurationDrawer({
   const updateNodeDetails = (
     label?: string | null,
     configured?: boolean | null,
-    disabled?: boolean | null
+    disabled?: boolean | null,
+    description?: string | null,
+    appearance?: NodeAppearanceConfigurations | null
   ) => {
     setConfigurationDrawer({ show: false });
     onDrawerClosed(
@@ -72,7 +86,13 @@ export default function ConfigurationDrawer({
         : flowConfigurationDrawer.configured!,
       !isUndefined(disabled) && disabled !== null
         ? disabled
-        : flowConfigurationDrawer.disabled!
+        : flowConfigurationDrawer.disabled!,
+      !isUndefined(description) && description !== null
+        ? description
+        : flowConfigurationDrawer.description!,
+      !isUndefined(appearance) && appearance !== null
+        ? appearance
+        : flowConfigurationDrawer.appearance!
     );
   };
 
@@ -81,7 +101,9 @@ export default function ConfigurationDrawer({
       updateNodeDetails(
         nodeConfigurations.label ? nodeConfigurations.label : moduleNode?.name,
         true,
-        nodeConfigurations.disabled
+        nodeConfigurations.disabled,
+        nodeConfigurations.description,
+        nodeConfigurations.appearance
       );
       return;
     }
@@ -113,6 +135,8 @@ export default function ConfigurationDrawer({
                   : flowConfigurationDrawer.label!,
               configured: flowConfigurationDrawer.configured!,
               disabled: flowConfigurationDrawer.disabled!,
+              description: flowConfigurationDrawer.description!,
+              appearance: flowConfigurationDrawer.appearance!,
             });
           }
         },
