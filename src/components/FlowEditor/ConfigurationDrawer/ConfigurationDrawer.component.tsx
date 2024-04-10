@@ -1,51 +1,38 @@
+import has from "lodash/has";
 import { useAtom } from "jotai";
-import {
-  Divider,
-  Drawer,
-  IconButton,
-  Input,
-  Panel,
-  Placeholder,
-  Stack,
-  Tabs,
-  Text,
-  Tooltip,
-  Whisper,
-} from "rsuite";
-import { flowEditorConfigurationsDrawer } from "../../../store/flowEditor.store";
-import isUndefined from "lodash/isUndefined";
 import { useEffect, useState } from "react";
+import isUndefined from "lodash/isUndefined";
+import { Drawer, Panel, Placeholder } from "rsuite";
+import DrawerHeader from "./DrawerHeader/DrawerHeader.component";
 import fetchNodes from "../../../service/nodes/fetchNodes.service";
+import NodeNameInput from "./NodeNameInput/NodeNameInput.component";
+import { flowEditorConfigurationsDrawer } from "../../../store/flowEditor.store";
+import NodeConfigurationTabs from "./NodeConfigurationTabs/NodeConfigurationTabs.component";
+import drawerInitialNodeConfigurations from "../../../defaults/drawerInitialNodeConfigurations.default";
 import {
   ApiResponse,
   FlowsConfigurationsDrawer,
   Node,
   NodeAppearanceConfigurations,
+  NodeConfiguration,
 } from "@ecoflow/types";
 import "./style.less";
-import { IconWrapper } from "@ecoflow/components-lib";
-import { LuCircleOff, LuCircle } from "react-icons/lu";
-import { FaCheck } from "react-icons/fa";
-import { FaXmark } from "react-icons/fa6";
-import { HiTag } from "react-icons/hi";
-import { GrConfigure } from "react-icons/gr";
-import { MdOutlineDescription } from "react-icons/md";
-import { LiaObjectGroup } from "react-icons/lia";
-import NodeDescriptionTab from "./NodeDescriptionTab/NodeDescriptionTab.component";
-import NodeAppearanceTab from "./NodeAppearanceTab/NodeAppearanceTab.component";
 
 interface ConfigurationDrawerProps {
+  configuration: NodeConfiguration[];
   onDrawerClosed?: (
     nodeID: string,
     label: string,
     configured: boolean,
     disabled: boolean,
     description: string,
-    appearance: NodeAppearanceConfigurations
+    appearance: NodeAppearanceConfigurations,
+    nodeConfiguration: NodeConfiguration
   ) => void;
 }
 
 export default function ConfigurationDrawer({
+  configuration,
   onDrawerClosed = () => {},
 }: ConfigurationDrawerProps) {
   const [isLoading, setLoading] = useState(true);
@@ -53,20 +40,9 @@ export default function ConfigurationDrawer({
     flowEditorConfigurationsDrawer
   );
   const [moduleNode, setModuleNode] = useState<Node>(null);
-  const [nodeConfigurations, setNodeConfigurations] = useState<
-    Required<
-      Pick<
-        FlowsConfigurationsDrawer,
-        "label" | "configured" | "disabled" | "description" | "appearance"
-      >
-    >
-  >({
-    label: "",
-    configured: false,
-    disabled: false,
-    description: "",
-    appearance: {},
-  });
+  const [nodeConfigurations, setNodeConfigurations] = useState(
+    drawerInitialNodeConfigurations
+  );
 
   const isOpen = (): boolean =>
     flowConfigurationDrawer.show &&
@@ -79,7 +55,8 @@ export default function ConfigurationDrawer({
     configured?: boolean | null,
     disabled?: boolean | null,
     description?: string | null,
-    appearance?: NodeAppearanceConfigurations | null
+    appearance?: NodeAppearanceConfigurations | null,
+    nodeConfiguration?: NodeConfiguration | null
   ) => {
     setConfigurationDrawer({ show: false });
     onDrawerClosed(
@@ -96,201 +73,122 @@ export default function ConfigurationDrawer({
         : flowConfigurationDrawer.description!,
       !isUndefined(appearance) && appearance !== null
         ? appearance
-        : flowConfigurationDrawer.appearance!
+        : flowConfigurationDrawer.appearance!,
+      !isUndefined(nodeConfiguration) && nodeConfiguration !== null
+        ? nodeConfiguration
+        : {
+            ...configuration.filter(
+              (nodeConfiguration) =>
+                nodeConfiguration.nodeID === flowConfigurationDrawer.nodeID!
+            )[0],
+          }
     );
   };
 
-  const drawerClosedHandler = (isClose?: boolean) => {
-    if (isClose) {
-      updateNodeDetails(
-        nodeConfigurations.label ? nodeConfigurations.label : moduleNode?.name,
-        true,
-        nodeConfigurations.disabled,
-        nodeConfigurations.description,
-        nodeConfigurations.appearance
-      );
+  const drawerClosedHandler = (isCommitSave?: boolean) => {
+    if (!isCommitSave) {
+      updateNodeDetails();
       return;
     }
-    updateNodeDetails();
+
+    updateNodeDetails(
+      nodeConfigurations.label ? nodeConfigurations.label : moduleNode?.name,
+      Object.keys(nodeConfigurations.nodeConfiguration.configs).length > 0,
+      nodeConfigurations.disabled,
+      nodeConfigurations.description,
+      nodeConfigurations.appearance,
+      nodeConfigurations.nodeConfiguration
+    );
   };
 
   const updateNodeConfiguration = (
     value: Pick<
       FlowsConfigurationsDrawer,
       "label" | "configured" | "disabled" | "description" | "appearance"
-    >
+    > & {
+      nodeConfiguration?: { [key: string]: any };
+    }
   ) =>
     setNodeConfigurations((nodeConfigurations) => {
       return {
         ...nodeConfigurations,
         ...value,
+        nodeConfiguration: has(value, "nodeConfiguration")
+          ? {
+              nodeID: flowConfigurationDrawer.nodeID!,
+              configs: value["nodeConfiguration"]!,
+            }
+          : nodeConfigurations.nodeConfiguration,
       };
     });
 
   useEffect(() => {
-    if (isOpen()) {
-      setLoading(true);
-      fetchNodes(flowConfigurationDrawer.moduleID?._id).then(
-        (response: ApiResponse) => {
-          setLoading(false);
-          if (response.success) {
-            setModuleNode(response.payload);
-            setNodeConfigurations({
-              label:
-                flowConfigurationDrawer.label === response.payload.name
-                  ? ""
-                  : flowConfigurationDrawer.label!,
-              configured: flowConfigurationDrawer.configured!,
-              disabled: flowConfigurationDrawer.disabled!,
-              description: flowConfigurationDrawer.description!,
-              appearance: flowConfigurationDrawer.appearance!,
-            });
-          }
-        },
-        (reject: ApiResponse) => {
-          setLoading(false);
-          console.error(reject);
+    if (!isOpen()) return;
+    setLoading(true);
+    fetchNodes(flowConfigurationDrawer.moduleID?._id).then(
+      (response: ApiResponse) => {
+        setLoading(false);
+        if (response.success) {
+          setModuleNode(response.payload);
+          setNodeConfigurations({
+            label:
+              flowConfigurationDrawer.label === response.payload.name
+                ? ""
+                : flowConfigurationDrawer.label!,
+            configured: flowConfigurationDrawer.configured!,
+            disabled: flowConfigurationDrawer.disabled!,
+            description: flowConfigurationDrawer.description!,
+            appearance: flowConfigurationDrawer.appearance!,
+            nodeConfiguration: configuration.filter(
+              (nodeConfiguration) =>
+                nodeConfiguration.nodeID === flowConfigurationDrawer.nodeID!
+            )[0],
+          });
         }
-      );
-    }
+      },
+      (reject: ApiResponse) => {
+        setLoading(false);
+        console.error(reject);
+      }
+    );
   }, [flowConfigurationDrawer]);
-
-  useEffect(() => console.log(moduleNode), [moduleNode]);
 
   return (
     <Drawer
       open={isOpen()}
       backdrop="static"
       onClose={() => drawerClosedHandler()}
+      onExited={() => setNodeConfigurations(drawerInitialNodeConfigurations)}
     >
-      <Drawer.Header>
-        <Drawer.Title>Node Configurations</Drawer.Title>
-        <Drawer.Actions>
-          <Whisper
-            placement="bottom"
-            speaker={<Tooltip arrow={false}>Enable/Diable Node</Tooltip>}
-          >
-            <IconButton
-              appearance="primary"
-              color="cyan"
-              icon={
-                <IconWrapper
-                  icon={nodeConfigurations.disabled ? LuCircleOff : LuCircle}
-                />
-              }
-              onClick={() =>
-                updateNodeConfiguration({
-                  disabled: !nodeConfigurations.disabled,
-                })
-              }
-            >
-              {nodeConfigurations.disabled ? "Diabled" : "Enabled"}
-            </IconButton>
-          </Whisper>
-          <Whisper
-            placement="bottom"
-            speaker={<Tooltip arrow={false}>Cancel</Tooltip>}
-          >
-            <IconButton
-              appearance="primary"
-              color="red"
-              icon={<IconWrapper icon={FaXmark} />}
-              onClick={() => drawerClosedHandler()}
-            />
-          </Whisper>
-          <Whisper
-            placement="bottom"
-            speaker={<Tooltip arrow={false}>Confirm</Tooltip>}
-          >
-            <IconButton
-              appearance="primary"
-              color="green"
-              icon={<IconWrapper icon={FaCheck} />}
-              onClick={() => drawerClosedHandler(true)}
-            />
-          </Whisper>
-        </Drawer.Actions>
-      </Drawer.Header>
+      <DrawerHeader
+        nodeConfigurations={nodeConfigurations}
+        enableDisabledButton={() =>
+          updateNodeConfiguration({
+            disabled: !nodeConfigurations.disabled,
+          })
+        }
+        cancelButton={() => drawerClosedHandler()}
+        confirmButton={() => drawerClosedHandler(true)}
+      />
       <Drawer.Body className="flow-configuration-drawer">
         <Panel bodyFill>
-          <Panel bodyFill>
-            <Stack spacing={35}>
-              <Text size="lg">
-                <IconWrapper icon={HiTag} /> Name :
-              </Text>
-              <Stack.Item grow={1}>
-                <Input
-                  id="nodename"
-                  autoComplete="off"
-                  disabled={isLoading}
-                  placeholder={moduleNode?.name}
-                  value={nodeConfigurations.label}
-                  onChange={(value: string) =>
-                    updateNodeConfiguration({ label: value })
-                  }
-                />
-              </Stack.Item>
-            </Stack>
-          </Panel>
-          <Divider />
+          <NodeNameInput
+            disabled={isLoading}
+            placeholder={moduleNode?.name}
+            value={nodeConfigurations.label}
+            onChange={(value: string) =>
+              updateNodeConfiguration({ label: value })
+            }
+          />
           {isLoading ? (
             <Placeholder.Paragraph rows={10} rowHeight={10} />
           ) : (
-            <Tabs
-              defaultActiveKey={
-                moduleNode?.inputs ? "configuration" : "description"
-              }
-            >
-              {moduleNode?.inputs ? (
-                <Tabs.Tab
-                  eventKey="configuration"
-                  disabled={isLoading}
-                  title="Configurations"
-                  icon={<IconWrapper icon={GrConfigure} />}
-                >
-                  <Panel>
-                    {flowConfigurationDrawer.label}
-                    <br />
-                    {JSON.stringify(flowConfigurationDrawer.moduleID)}
-                    <br />
-                    {flowConfigurationDrawer.nodeID}
-                  </Panel>
-                </Tabs.Tab>
-              ) : (
-                <></>
-              )}
-              <Tabs.Tab
-                eventKey="description"
-                disabled={isLoading}
-                title="Description"
-                icon={<IconWrapper icon={MdOutlineDescription} />}
-              >
-                <Panel bodyFill style={{ paddingTop: 20 }}>
-                  <NodeDescriptionTab
-                    text={nodeConfigurations.description}
-                    onChange={(value) =>
-                      updateNodeConfiguration({ description: value })
-                    }
-                  />
-                </Panel>
-              </Tabs.Tab>
-              <Tabs.Tab
-                eventKey="appearance"
-                disabled={isLoading}
-                title="Appearance"
-                icon={<IconWrapper icon={LiaObjectGroup} />}
-              >
-                <Panel>
-                  <NodeAppearanceTab
-                    values={nodeConfigurations.appearance}
-                    type={moduleNode?.type}
-                    onChange={(value) =>
-                      updateNodeConfiguration({ appearance: value })
-                    }
-                  />
-                </Panel>
-              </Tabs.Tab>
-            </Tabs>
+            <NodeConfigurationTabs
+              moduleNode={moduleNode}
+              nodeConfigurations={nodeConfigurations}
+              disabled={isLoading}
+              onChange={updateNodeConfiguration}
+            />
           )}
         </Panel>
       </Drawer.Body>
