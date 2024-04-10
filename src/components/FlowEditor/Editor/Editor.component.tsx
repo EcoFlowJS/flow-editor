@@ -19,6 +19,7 @@ import {
   EcoModuleID,
   FlowsDataTypes,
   NodeAppearanceConfigurations,
+  NodeConfiguration,
 } from "@ecoflow/types";
 import { useAtomValue, useSetAtom } from "jotai";
 import {
@@ -41,6 +42,9 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState<FlowsDataTypes>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodeConfigurations, setNodeConfigurations] = useState<
+    NodeConfiguration[]
+  >([]);
   const [lastFlow, setLastFlow] = useState("");
   const [activeFlow, setActiveFlow] = useState("");
   const openDrawer = useSetAtom(flowEditorConfigurationsDrawer);
@@ -137,6 +141,9 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
       };
 
       setNodes((nds) => nds.concat(newNode));
+      setNodeConfigurations((configurations) =>
+        configurations.concat([{ nodeID, configs: {} }])
+      );
     },
     [reactFlowInstance]
   );
@@ -147,7 +154,8 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
     configured: boolean,
     disabled: boolean,
     description: string,
-    appearance: NodeAppearanceConfigurations
+    appearance: NodeAppearanceConfigurations,
+    nodeConfiguration: NodeConfiguration
   ) => {
     setNodes((nodes) => {
       const updatedNodes = nodes.map((node) => {
@@ -177,6 +185,15 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
         })
       );
 
+      setNodeConfigurations((configurations) =>
+        configurations.map((configuration) => {
+          if (configuration.nodeID === nodeID)
+            configuration.configs = nodeConfiguration.configs;
+
+          return { ...configuration };
+        })
+      );
+
       return updatedNodes;
     });
   };
@@ -192,11 +209,14 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
     if (isEmpty(activeFlow) && isEmpty(lastFlow)) return;
     setNodes(flowHandlers.flowEditorValue[activeFlow].definitions);
     setEdges(flowHandlers.flowEditorValue[activeFlow].connections);
+    setNodeConfigurations(
+      flowHandlers.flowEditorValue[activeFlow].configurations
+    );
 
     flowHandlers.updateFlowEditor(lastFlow, {
       definitions: nodes,
       connections: edges,
-      configurations: [],
+      configurations: nodeConfigurations,
     });
   }, [activeFlow]);
 
@@ -244,7 +264,10 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
           </ReactFlow>
         </ReactFlowProvider>
       </div>
-      <ConfigurationDrawer onDrawerClosed={handleDrawerClosed} />
+      <ConfigurationDrawer
+        configuration={nodeConfigurations}
+        onDrawerClosed={handleDrawerClosed}
+      />
     </>
   );
 }
