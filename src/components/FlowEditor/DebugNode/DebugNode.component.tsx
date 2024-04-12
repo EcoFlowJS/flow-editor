@@ -46,8 +46,8 @@ const DebugNode = memo(
                   }`}
                   style={
                     !isUndefined(appearance.label) && !appearance.label
-                      ? { width: 30, height: 30 }
-                      : { width: 130, height: 30 }
+                      ? { width: 30, minHeight: 30 }
+                      : { width: 130, minHeight: 30 }
                   }
                 >
                   {!isUndefined(appearance.label) && appearance.label ? (
@@ -60,7 +60,14 @@ const DebugNode = memo(
                   ) : (
                     <></>
                   )}
-                  <div className="node-icon-right">
+                  <div
+                    className="node-icon-right"
+                    style={{
+                      ...(!isUndefined(appearance.label) && !appearance.label
+                        ? { borderLeft: "none", borderRadius: 4 }
+                        : {}),
+                    }}
+                  >
                     <FlexboxGrid
                       justify="center"
                       align="middle"
@@ -131,8 +138,8 @@ const DebugNode = memo(
                   }`}
                   style={
                     !isUndefined(appearance.label) && !appearance.label
-                      ? { width: 30, height: 30 }
-                      : { width: 130, height: 30 }
+                      ? { width: 30, minHeight: 30 }
+                      : { width: 130, minHeight: 30 }
                   }
                 >
                   {!isUndefined(appearance.label) && appearance.label ? (
@@ -145,7 +152,14 @@ const DebugNode = memo(
                   ) : (
                     <></>
                   )}
-                  <div className="node-icon-right">
+                  <div
+                    className="node-icon-right"
+                    style={{
+                      ...(!isUndefined(appearance.label) && !appearance.label
+                        ? { borderLeft: "none", borderRadius: 4 }
+                        : {}),
+                    }}
+                  >
                     <FlexboxGrid
                       justify="center"
                       align="middle"
