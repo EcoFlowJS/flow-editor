@@ -46,11 +46,18 @@ const MiddlewareNode = memo(
                   }`}
                   style={
                     !isUndefined(appearance.label) && !appearance.label
-                      ? { width: 30, height: 30 }
-                      : { width: 130, height: 30 }
+                      ? { width: 30, minHeight: 30 }
+                      : { width: 130, minHeight: 30 }
                   }
                 >
-                  <div className="node-icon-left">
+                  <div
+                    className="node-icon-left"
+                    style={{
+                      ...(!isUndefined(appearance.label) && !appearance.label
+                        ? { borderRight: "none", borderRadius: 4 }
+                        : {}),
+                    }}
+                  >
                     <FlexboxGrid
                       justify="center"
                       align="middle"
@@ -152,11 +159,18 @@ const MiddlewareNode = memo(
                   }`}
                   style={
                     !isUndefined(appearance.label) && !appearance.label
-                      ? { width: 30, height: 30 }
-                      : { width: 130, height: 30 }
+                      ? { width: 30, minHeight: 30 }
+                      : { width: 130, minHeight: 30 }
                   }
                 >
-                  <div className="node-icon-left">
+                  <div
+                    className="node-icon-left"
+                    style={{
+                      ...(!isUndefined(appearance.label) && !appearance.label
+                        ? { borderRight: "none", borderRadius: 4 }
+                        : {}),
+                    }}
+                  >
                     <FlexboxGrid
                       justify="center"
                       align="middle"

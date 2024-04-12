@@ -93,7 +93,10 @@ export default function ConfigurationDrawer({
 
     updateNodeDetails(
       nodeConfigurations.label ? nodeConfigurations.label : moduleNode?.name,
-      Object.keys(nodeConfigurations.nodeConfiguration.configs).length > 0,
+      Object.keys(nodeConfigurations.nodeConfiguration.configs).length > 0 ||
+        isUndefined(moduleNode?.inputs) ||
+        moduleNode?.inputs === null ||
+        moduleNode?.inputs.length === 0,
       nodeConfigurations.disabled,
       nodeConfigurations.description,
       nodeConfigurations.appearance,
