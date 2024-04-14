@@ -51,6 +51,7 @@ export default function NodeConfigurationTabs({
         >
           <Panel>
             <NodeInputConfigurationsTab
+              nodeType={moduleNode.type}
               nodeInputs={moduleNode.inputs}
               nodeConfigurations={nodeConfigurations?.nodeConfiguration.configs}
               onChange={(value) => onChange({ nodeConfiguration: value })}

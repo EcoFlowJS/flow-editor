@@ -15,6 +15,7 @@
     "@ecoflow/components-lib": "^0.1.0",
     "@ecoflow/types": "^0.0.1",
     "@koa/router": "^11.0.2",
+    "@monaco-editor/react": "^4.6.0",
     "@rsuite/responsive-nav": "^5.0.1",
     "axios": "^1.6.8",
     "jotai": "^2.7.1",
