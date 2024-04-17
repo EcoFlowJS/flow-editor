@@ -3,7 +3,7 @@ import {
   ModuleSpecsInputs,
   ModuleSpecsInputsTypeOptions,
 } from "@ecoflow/types";
-import { useEffect, useState } from "react";
+import { useEffect, useState, KeyboardEvent } from "react";
 import {
   CheckPicker,
   Checkbox,
@@ -19,18 +19,23 @@ import {
   SelectPicker,
   Toggle,
   Text,
+  Divider,
+  List,
+  IconButton,
 } from "rsuite";
 import getDB_Connections from "../../../../../service/schema/getDB_Connections.service";
 import { ItemDataType } from "rsuite/esm/MultiCascadeTree";
 import { Editor } from "@monaco-editor/react";
-import { InputPassword } from "@ecoflow/components-lib";
+import { IconWrapper, InputPassword } from "@ecoflow/components-lib";
 import isUndefined from "lodash/isUndefined";
-import { isEmpty } from "lodash";
+import isEmpty from "lodash/isEmpty";
+import { FaXmark } from "react-icons/fa6";
+import { MovedItemInfo } from "rsuite/esm/List/helper/useSortHelper";
 
 interface NodeInputsProps {
   inputSpecs: ModuleSpecsInputs;
   isEndNode?: boolean;
-  onChange?: (validated: boolean, value: any) => void;
+  onChange?: (id: string, validated: boolean, value: any) => void;
 }
 
 export default function NodeInputs({
@@ -74,6 +79,15 @@ export default function NodeInputs({
     validate: true,
   });
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [queryStringParameterValue, setQueryStringParameterValue] =
+    useState("");
+  const [queryStringParameterList, setQueryStringParameterList] = useState<
+    string[]
+  >([]);
+
+  const [urlParameterValue, setURLParameterValue] = useState("");
+  const [urlParameterList, setURLParameterList] = useState<string[]>([]);
 
   const isPickerOptionsIsString = (
     pickerOptions: String[] | ModuleSpecsInputsTypeOptions[]
@@ -126,32 +140,85 @@ export default function NodeInputs({
     }
   };
 
+  const handleQueryStringAddition = () =>
+    setQueryStringParameterList((queryStringParameterList) => {
+      if (
+        queryStringParameterList.includes(queryStringParameterValue.trim()) ||
+        /\s/g.test(queryStringParameterValue.trim()) ||
+        isEmpty(queryStringParameterValue)
+      )
+        return queryStringParameterList;
+      return [...queryStringParameterList, queryStringParameterValue.trim()];
+    });
+
+  const handleURLParameterAddition = () =>
+    setURLParameterList((urlParameterList) => {
+      if (
+        urlParameterList.includes(urlParameterValue.trim()) ||
+        /\s/g.test(urlParameterValue.trim()) ||
+        isEmpty(urlParameterValue)
+      )
+        return urlParameterList;
+      return [...urlParameterList, urlParameterValue.trim()];
+    });
+
+  const handleQueryStringRemoval = (id: number) =>
+    setQueryStringParameterList((queryStringParameterList) => {
+      queryStringParameterList.splice(id, 1);
+      return [...queryStringParameterList];
+    });
+
+  const handleURLParameterRemoval = (id: number) =>
+    setURLParameterList((urlParameterList) => {
+      urlParameterList.splice(id, 1);
+      return [...urlParameterList];
+    });
+
+  const handleQueryStringAdditionKeyDown = (
+    event: KeyboardEvent<HTMLInputElement>
+  ) => (event.key === "Enter" ? handleQueryStringAddition() : null);
+
+  const handleURLParameterAdditionKeyDown = (
+    event: KeyboardEvent<HTMLInputElement>
+  ) => (event.key === "Enter" ? handleURLParameterAddition() : null);
+
+  const handleURLParameterSort = ({ oldIndex, newIndex }: MovedItemInfo) =>
+    setURLParameterList((urlParameters) => {
+      const moveData = urlParameters.splice(oldIndex, 1);
+      const newData = [...urlParameters];
+      newData.splice(newIndex, 0, moveData[0]);
+      return newData;
+    });
+
+  const updateResponse = (validated: boolean, value: any, id = name) =>
+    onChange(id, validated, value);
+
   useEffect(() => {
     const value = type === "Code" ? codeValue.value : inputValue[name];
     const isRequired = isUndefined(required) ? false : required;
     switch (type) {
       case "Code":
-        if (isRequired && isEmpty(value)) onChange(false, value);
+        if (isRequired && isEmpty(value)) updateResponse(false, value);
         else if (isRequired && !isEmpty(value))
-          onChange(true && codeValue.validate, value);
-        else onChange(true && codeValue.validate, value);
+          updateResponse(true && codeValue.validate, value);
+        else updateResponse(true && codeValue.validate, value);
         break;
       case "CheckPicker":
         setErrorMessage("");
         if (isRequired && (value === null || value.length === 0)) {
           setErrorMessage("Field is Required");
-          onChange(false, value);
-        } else if (isRequired && value.length > 0) onChange(true, value);
-        else onChange(true, value);
+          updateResponse(false, value);
+        } else if (isRequired && value.length > 0) updateResponse(true, value);
+        else updateResponse(true, value);
         break;
       case "Toggle":
       case "Checkbox":
         setErrorMessage("");
         if (isRequired && !value) {
           setErrorMessage("Must be checked");
-          onChange(false, value);
-        } else if (isRequired && value) onChange(true, value);
-        else onChange(true, value);
+          updateResponse(false, value);
+        } else if (isRequired && value) updateResponse(true, value);
+        else updateResponse(true, value);
         break;
       case "Methods":
       case "Date":
@@ -162,31 +229,46 @@ export default function NodeInputs({
         setErrorMessage("");
         if (isRequired && isEmpty(value)) {
           setErrorMessage("Field is Required");
-          onChange(false, value);
-        } else if (isRequired && !isEmpty(value)) onChange(true, value);
-        else onChange(true, value);
+          updateResponse(false, value);
+        } else if (isRequired && !isEmpty(value)) updateResponse(true, value);
+        else updateResponse(true, value);
         break;
       case "Range":
         setErrorMessage("");
-        console.log(value);
-
         if (isRequired && (isEmpty(value.start) || isEmpty(value.end))) {
           setErrorMessage("Both Field is Required");
-          onChange(false, value);
+          updateResponse(false, value);
         } else if (isRequired && !isEmpty(value.start) && !isEmpty(value.end))
-          onChange(true && Number(value.end) >= Number(value.start), value);
-        else onChange(true && Number(value.end) >= Number(value.start), value);
+          updateResponse(
+            true && Number(value.end) >= Number(value.start),
+            value
+          );
+        else
+          updateResponse(
+            true && Number(value.end) >= Number(value.start),
+            value
+          );
         break;
       default:
         setErrorMessage("");
         if (isRequired && isEmpty(value)) {
           setErrorMessage("Field is Required");
-          onChange(false, value);
-        } else if (isRequired && !isEmpty(value)) onChange(true, value);
-        else onChange(true, value);
+          updateResponse(false, value);
+        } else if (isRequired && !isEmpty(value)) updateResponse(true, value);
+        else updateResponse(true, value);
         break;
     }
-  }, [inputValue, codeValue]);
+  }, [inputValue[name], codeValue]);
+
+  useEffect(
+    () => updateResponse(true, queryStringParameterList, "$url.query"),
+    [queryStringParameterList]
+  );
+
+  useEffect(
+    () => updateResponse(false, urlParameterList, "$url.params"),
+    [urlParameterList]
+  );
 
   return (
     <>
@@ -414,7 +496,126 @@ export default function NodeInputs({
           {errorMessage ? <Text muted>{errorMessage}</Text> : <></>}
         </FlexboxGrid.Item>
       </FlexboxGrid>
-      {isEndNode ? "hello" : <></>}
+      {isEndNode ? (
+        <>
+          <Panel bordered header="URL Parameters :" style={{ marginTop: 10 }}>
+            <FlexboxGrid justify="center" align="middle">
+              <FlexboxGrid.Item colspan={24}>
+                <InputGroup>
+                  <Input
+                    placeholder="URL Parameters"
+                    onChange={setURLParameterValue}
+                    value={urlParameterValue}
+                    onKeyDown={handleURLParameterAdditionKeyDown}
+                  />
+                  <InputGroup.Button onClick={handleURLParameterAddition}>
+                    Insert
+                  </InputGroup.Button>
+                </InputGroup>
+              </FlexboxGrid.Item>
+              <FlexboxGrid.Item colspan={24}>
+                <Divider />
+              </FlexboxGrid.Item>
+              <FlexboxGrid.Item colspan={22}>
+                {urlParameterList.length === 0 ? (
+                  <FlexboxGrid justify="center">
+                    <Text muted>No URL parameters available</Text>
+                  </FlexboxGrid>
+                ) : (
+                  <List
+                    bordered
+                    sortable
+                    onSort={handleURLParameterSort}
+                    style={{
+                      overflow: "auto",
+                      maxHeight: 300,
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    {urlParameterList.map((value, key) => (
+                      <List.Item key={key} index={key}>
+                        <FlexboxGrid justify="space-between" align="middle">
+                          <FlexboxGrid.Item colspan={20}>
+                            {value}
+                          </FlexboxGrid.Item>
+                          <FlexboxGrid.Item>
+                            <IconButton
+                              appearance="subtle"
+                              color="red"
+                              icon={<IconWrapper icon={FaXmark} />}
+                              onClick={() => handleURLParameterRemoval(key)}
+                            />
+                          </FlexboxGrid.Item>
+                        </FlexboxGrid>
+                      </List.Item>
+                    ))}
+                  </List>
+                )}
+              </FlexboxGrid.Item>
+            </FlexboxGrid>
+          </Panel>
+          <Panel
+            bordered
+            header="Query String Parameters :"
+            style={{ marginTop: 20 }}
+          >
+            <FlexboxGrid justify="center" align="middle">
+              <FlexboxGrid.Item colspan={24}>
+                <InputGroup>
+                  <Input
+                    placeholder="Query String Parameters"
+                    onChange={setQueryStringParameterValue}
+                    value={queryStringParameterValue}
+                    onKeyDown={handleQueryStringAdditionKeyDown}
+                  />
+                  <InputGroup.Button onClick={handleQueryStringAddition}>
+                    Insert
+                  </InputGroup.Button>
+                </InputGroup>
+              </FlexboxGrid.Item>
+              <FlexboxGrid.Item colspan={24}>
+                <Divider />
+              </FlexboxGrid.Item>
+              <FlexboxGrid.Item colspan={22}>
+                {queryStringParameterList.length === 0 ? (
+                  <FlexboxGrid justify="center">
+                    <Text muted>No Query parameters available</Text>
+                  </FlexboxGrid>
+                ) : (
+                  <List
+                    bordered
+                    style={{
+                      overflow: "auto",
+                      maxHeight: 300,
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    {queryStringParameterList.map((value, key) => (
+                      <List.Item key={key}>
+                        <FlexboxGrid justify="space-between" align="middle">
+                          <FlexboxGrid.Item colspan={20}>
+                            {value}
+                          </FlexboxGrid.Item>
+                          <FlexboxGrid.Item>
+                            <IconButton
+                              appearance="subtle"
+                              color="red"
+                              icon={<IconWrapper icon={FaXmark} />}
+                              onClick={() => handleQueryStringRemoval(key)}
+                            />
+                          </FlexboxGrid.Item>
+                        </FlexboxGrid>
+                      </List.Item>
+                    ))}
+                  </List>
+                )}
+              </FlexboxGrid.Item>
+            </FlexboxGrid>
+          </Panel>
+        </>
+      ) : (
+        <></>
+      )}
     </>
   );
 }
