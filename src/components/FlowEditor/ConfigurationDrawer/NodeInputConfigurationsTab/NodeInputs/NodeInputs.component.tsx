@@ -2,6 +2,7 @@ import {
   ApiResponse,
   ModuleSpecsInputs,
   ModuleSpecsInputsTypeOptions,
+  NodeConfiguration,
 } from "@ecoflow/types";
 import { useEffect, useState } from "react";
 import {
@@ -25,22 +26,26 @@ import { ItemDataType } from "rsuite/esm/MultiCascadeTree";
 import { Editor } from "@monaco-editor/react";
 import { InputPassword } from "@ecoflow/components-lib";
 import isUndefined from "lodash/isUndefined";
-import { isEmpty } from "lodash";
+import isEmpty from "lodash/isEmpty";
+import QueryStringParameters from "./QueryStringParameters/QueryStringParameters.component";
+import URLParameters from "./URLParameters/URLParameters.component";
 
 interface NodeInputsProps {
   inputSpecs: ModuleSpecsInputs;
+  nodeConfigurations?: NodeConfiguration["configs"];
   isEndNode?: boolean;
-  onChange?: (validated: boolean, value: any) => void;
+  onChange?: (id: string, validated: boolean, value: any) => void;
 }
 
 export default function NodeInputs({
   inputSpecs,
+  nodeConfigurations,
   isEndNode = false,
   onChange = () => {},
 }: NodeInputsProps) {
   const {
     name,
-    lable,
+    label,
     type,
     methods,
     required,
@@ -51,7 +56,9 @@ export default function NodeInputs({
 
   const initialValue = Object.create({});
   initialValue[name] =
-    defaultValue && type !== "Code"
+    nodeConfigurations && nodeConfigurations[name]
+      ? nodeConfigurations[name]
+      : defaultValue && type !== "Code"
       ? defaultValue
       : type === "Methods" ||
         type === "Date" ||
@@ -126,32 +133,35 @@ export default function NodeInputs({
     }
   };
 
+  const updateResponse = (validated: boolean, value: any, id = name) =>
+    onChange(id, validated, value);
+
   useEffect(() => {
-    const value = type === "Code" ? codeValue.value : inputValue[name];
+    const value = type === "Code" ? codeValue : inputValue[name];
     const isRequired = isUndefined(required) ? false : required;
     switch (type) {
       case "Code":
-        if (isRequired && isEmpty(value)) onChange(false, value);
+        if (isRequired && isEmpty(value)) updateResponse(false, value);
         else if (isRequired && !isEmpty(value))
-          onChange(true && codeValue.validate, value);
-        else onChange(true && codeValue.validate, value);
+          updateResponse(true && codeValue.validate, value);
+        else updateResponse(true && codeValue.validate, value);
         break;
       case "CheckPicker":
         setErrorMessage("");
         if (isRequired && (value === null || value.length === 0)) {
           setErrorMessage("Field is Required");
-          onChange(false, value);
-        } else if (isRequired && value.length > 0) onChange(true, value);
-        else onChange(true, value);
+          updateResponse(false, value);
+        } else if (isRequired && value.length > 0) updateResponse(true, value);
+        else updateResponse(true, value);
         break;
       case "Toggle":
       case "Checkbox":
         setErrorMessage("");
         if (isRequired && !value) {
           setErrorMessage("Must be checked");
-          onChange(false, value);
-        } else if (isRequired && value) onChange(true, value);
-        else onChange(true, value);
+          updateResponse(false, value);
+        } else if (isRequired && value) updateResponse(true, value);
+        else updateResponse(true, value);
         break;
       case "Methods":
       case "Date":
@@ -162,31 +172,38 @@ export default function NodeInputs({
         setErrorMessage("");
         if (isRequired && isEmpty(value)) {
           setErrorMessage("Field is Required");
-          onChange(false, value);
-        } else if (isRequired && !isEmpty(value)) onChange(true, value);
-        else onChange(true, value);
+          updateResponse(false, value);
+        } else if (isRequired && !isEmpty(value)) updateResponse(true, value);
+        else updateResponse(true, value);
         break;
       case "Range":
         setErrorMessage("");
-        console.log(value);
-
         if (isRequired && (isEmpty(value.start) || isEmpty(value.end))) {
           setErrorMessage("Both Field is Required");
-          onChange(false, value);
+          updateResponse(false, value);
         } else if (isRequired && !isEmpty(value.start) && !isEmpty(value.end))
-          onChange(true && Number(value.end) >= Number(value.start), value);
-        else onChange(true && Number(value.end) >= Number(value.start), value);
+          updateResponse(
+            true && Number(value.end) >= Number(value.start),
+            value
+          );
+        else
+          updateResponse(
+            true && Number(value.end) >= Number(value.start),
+            value
+          );
         break;
       default:
         setErrorMessage("");
         if (isRequired && isEmpty(value)) {
           setErrorMessage("Field is Required");
-          onChange(false, value);
-        } else if (isRequired && !isEmpty(value)) onChange(true, value);
-        else onChange(true, value);
+          updateResponse(false, value);
+        } else if (isRequired && !isEmpty(value)) updateResponse(true, value);
+        else updateResponse(true, value);
         break;
     }
-  }, [inputValue, codeValue]);
+  }, [inputValue[name], codeValue]);
+
+  useEffect(() => fetchPickerOptions(), []);
 
   return (
     <>
@@ -199,9 +216,9 @@ export default function NodeInputs({
           {...(type === "Code" ? { colspan: 24 } : { style: { width: 120 } })}
         >
           {type === "Code" ? (
-            <Heading style={{ padding: "5px 10px" }}>{lable}</Heading>
+            <Heading style={{ padding: "5px 10px" }}>{label}</Heading>
           ) : (
-            `${lable} :`
+            `${label} :`
           )}
         </FlexboxGrid.Item>
         <FlexboxGrid.Item
@@ -212,12 +229,17 @@ export default function NodeInputs({
             : { style: { width: 300 } })}
         >
           {type === "Route" ? (
-            <Input
-              type="text"
-              name={name}
-              value={inputValue[name]}
-              onChange={updateInputValue}
-            />
+            <InputGroup>
+              <InputGroup.Addon>/</InputGroup.Addon>
+              <Input
+                type="text"
+                name={name}
+                autoComplete="off"
+                spellCheck={false}
+                value={inputValue[name]}
+                onChange={updateInputValue}
+              />
+            </InputGroup>
           ) : type === "DB_Selector" ||
             type === "Methods" ||
             type === "SelectPicker" ? (
@@ -334,13 +356,22 @@ export default function NodeInputs({
           ) : type === "Number" ? (
             <InputNumber
               name={name}
+              autoComplete="off"
+              spellCheck={false}
               value={inputValue[name]}
               onChange={updateInputValue}
             />
           ) : type === "String" ? (
-            <Input value={inputValue[name]} onChange={updateInputValue} />
+            <Input
+              autoComplete="off"
+              spellCheck={false}
+              value={inputValue[name]}
+              onChange={updateInputValue}
+            />
           ) : type === "HiddenString" ? (
             <InputPassword
+              autoComplete="off"
+              spellCheck={false}
               value={inputValue[name]}
               onChange={updateInputValue}
             />
@@ -371,6 +402,8 @@ export default function NodeInputs({
           ) : type === "Range" ? (
             <InputGroup>
               <InputNumber
+                autoComplete="off"
+                spellCheck={false}
                 value={inputValue[name].start}
                 onChange={(start) =>
                   updateInputValue({
@@ -391,6 +424,8 @@ export default function NodeInputs({
                     ? Number(inputValue[name].start)
                     : undefined
                 }
+                autoComplete="off"
+                spellCheck={false}
                 value={inputValue[name].end}
                 onChange={(end) =>
                   updateInputValue({ ...inputValue[name], end })
@@ -398,7 +433,12 @@ export default function NodeInputs({
               />
             </InputGroup>
           ) : (
-            <Input value={inputValue[name]} onChange={updateInputValue} />
+            <Input
+              autoComplete="off"
+              spellCheck={false}
+              value={inputValue[name]}
+              onChange={updateInputValue}
+            />
           )}
         </FlexboxGrid.Item>
         <FlexboxGrid.Item
@@ -414,7 +454,28 @@ export default function NodeInputs({
           {errorMessage ? <Text muted>{errorMessage}</Text> : <></>}
         </FlexboxGrid.Item>
       </FlexboxGrid>
-      {isEndNode ? "hello" : <></>}
+      {isEndNode ? (
+        <>
+          <URLParameters
+            urlParameters={
+              nodeConfigurations && nodeConfigurations["$url.params"]
+                ? nodeConfigurations["$url.params"]
+                : []
+            }
+            onUpdate={(id, value) => updateResponse(true, value, id)}
+          />
+          <QueryStringParameters
+            queryStrings={
+              nodeConfigurations && nodeConfigurations["$url.query"]
+                ? nodeConfigurations["$url.query"]
+                : []
+            }
+            onUpdate={(id, value) => updateResponse(true, value, id)}
+          />
+        </>
+      ) : (
+        <></>
+      )}
     </>
   );
 }
