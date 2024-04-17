@@ -18,6 +18,7 @@ const flowEditorSettings = atom<FlowEditorSettingsConfigurations>(
   defaultFlowEditorSettings
 );
 
+const currentFlow = atom<string>("");
 const currentFlowNodes = atom<Node<FlowsDataTypes, string | undefined>[]>([]);
 const currentFlowEdges = atom<Edge<any>[]>([]);
 const currentFlowConfigurations = atom<NodeConfiguration[]>([]);
@@ -27,6 +28,7 @@ export {
   flowEditorConfigurationsDrawer,
   debugConsoleDrawer,
   flowEditorSettings,
+  currentFlow,
   currentFlowNodes,
   currentFlowEdges,
   currentFlowConfigurations,
