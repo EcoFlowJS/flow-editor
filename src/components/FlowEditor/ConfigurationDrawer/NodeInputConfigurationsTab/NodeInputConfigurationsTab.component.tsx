@@ -16,14 +16,25 @@ interface NodeInputConfigurationsTabProps {
 export default function NodeInputConfigurationsTab({
   nodeType = "Request",
   nodeInputs,
-  nodeConfigurations,
+  nodeConfigurations = {},
   onChange = () => {},
 }: NodeInputConfigurationsTabProps) {
-  const [nodeConfiguration, _setNodeConfiguration] = useState(
-    nodeConfigurations || {}
-  );
+  const [nodeConfiguration, setNodeConfiguration] = useState<{
+    [key: string]: any;
+  }>({});
+
+  const handleNodeInputChange = (id: string, validated: boolean, value: any) =>
+    setNodeConfiguration((nodeConfigurations) => {
+      nodeConfigurations[id] = {
+        validated,
+        value,
+      };
+
+      return { ...nodeConfigurations };
+    });
 
   useEffect(() => onChange(nodeConfiguration), [nodeConfiguration]);
+
   return (
     <>
       {nodeInputs ? (
@@ -34,7 +45,8 @@ export default function NodeInputConfigurationsTab({
               isEndNode={
                 nodeType === "Request" && key + 1 === nodeInputs.length
               }
-              onChange={console.log}
+              nodeConfigurations={nodeConfigurations}
+              onChange={handleNodeInputChange}
             />
           </div>
         ))

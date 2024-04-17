@@ -23,6 +23,9 @@ import {
 } from "@ecoflow/types";
 import { useAtomValue, useSetAtom } from "jotai";
 import {
+  currentFlowConfigurations,
+  currentFlowEdges,
+  currentFlowNodes,
   flowEditorConfigurationsDrawer,
   flowEditorSettings,
 } from "../../../store/flowEditor.store";
@@ -47,6 +50,9 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
   >([]);
   const [lastFlow, setLastFlow] = useState("");
   const [activeFlow, setActiveFlow] = useState("");
+  const setCurrentFlowNodes = useSetAtom(currentFlowNodes);
+  const setCurrentFlowEdges = useSetAtom(currentFlowEdges);
+  const setCurrentFlowConfigurations = useSetAtom(currentFlowConfigurations);
   const openDrawer = useSetAtom(flowEditorConfigurationsDrawer);
   const flowSettings = useAtomValue(flowEditorSettings);
   const flowHandlers = flowEditorHandlers();
@@ -219,6 +225,13 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
       configurations: nodeConfigurations,
     });
   }, [activeFlow]);
+
+  useEffect(() => setCurrentFlowNodes(nodes), [nodes]);
+  useEffect(() => setCurrentFlowEdges(edges), [edges]);
+  useEffect(
+    () => setCurrentFlowConfigurations(nodeConfigurations),
+    [nodeConfigurations]
+  );
 
   return (
     <>

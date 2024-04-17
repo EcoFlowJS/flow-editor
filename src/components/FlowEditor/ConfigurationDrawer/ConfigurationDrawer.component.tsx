@@ -91,16 +91,33 @@ export default function ConfigurationDrawer({
       return;
     }
 
+    const finalNodeConfiguration = (
+      configs: NodeConfiguration
+    ): NodeConfiguration => {
+      Object.keys(configs.configs).map((configKey) => {
+        if (has(configs.configs[configKey], "validated"))
+          delete configs.configs[configKey].validated;
+
+        configs.configs[configKey] = has(configs.configs[configKey], "value")
+          ? configs.configs[configKey].value
+          : configs.configs[configKey];
+      });
+
+      return configs;
+    };
+
     updateNodeDetails(
       nodeConfigurations.label ? nodeConfigurations.label : moduleNode?.name,
-      Object.keys(nodeConfigurations.nodeConfiguration.configs).length > 0 ||
+      Object.keys(nodeConfigurations.nodeConfiguration.configs).filter(
+        (key) => !nodeConfigurations.nodeConfiguration.configs[key].validated
+      ).length == 0 ||
         isUndefined(moduleNode?.inputs) ||
         moduleNode?.inputs === null ||
         moduleNode?.inputs.length === 0,
       nodeConfigurations.disabled,
       nodeConfigurations.description,
       nodeConfigurations.appearance,
-      nodeConfigurations.nodeConfiguration
+      finalNodeConfiguration(nodeConfigurations.nodeConfiguration)
     );
   };
 
