@@ -1,5 +1,5 @@
 import { IconWrapper } from "@ecoflow/components-lib";
-import { FlowsDataTypes } from "@ecoflow/types";
+import { FlowsNodeDataTypes } from "@ecoflow/types";
 import { memo } from "react";
 import { GiServerRack } from "react-icons/gi";
 import { Handle, NodeProps, Position } from "reactflow";
@@ -9,7 +9,7 @@ import isEmpty from "lodash/isEmpty";
 import iconFetcher from "../../../helper/iconFetcher";
 
 const MiddlewareNode = memo(
-  ({ id, data, isConnectable, selected }: NodeProps<FlowsDataTypes>) => {
+  ({ id, data, isConnectable, selected }: NodeProps<FlowsNodeDataTypes>) => {
     const {
       label,
       icon,

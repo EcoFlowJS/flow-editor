@@ -3,13 +3,13 @@ import { Handle, NodeProps, Position } from "reactflow";
 import { Badge, FlexboxGrid, Text, Tooltip, Whisper } from "rsuite";
 import { IconWrapper } from "@ecoflow/components-lib";
 import { TbRouteSquare2 } from "react-icons/tb";
-import { FlowsDataTypes } from "@ecoflow/types";
+import { FlowsNodeDataTypes } from "@ecoflow/types";
 import isUndefined from "lodash/isUndefined";
 import isEmpty from "lodash/isEmpty";
 import iconFetcher from "../../../helper/iconFetcher";
 
 const RequestNode = memo(
-  ({ id, data, isConnectable, selected }: NodeProps<FlowsDataTypes>) => {
+  ({ id, data, isConnectable, selected }: NodeProps<FlowsNodeDataTypes>) => {
     const {
       label,
       icon,

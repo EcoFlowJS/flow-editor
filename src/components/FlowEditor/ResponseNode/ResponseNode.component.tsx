@@ -11,7 +11,7 @@ import {
   useStore,
 } from "reactflow";
 import { Badge, FlexboxGrid, Text, Tooltip, Whisper } from "rsuite";
-import { FlowsDataTypes } from "@ecoflow/types";
+import { FlowsNodeDataTypes } from "@ecoflow/types";
 import isUndefined from "lodash/isUndefined";
 import isEmpty from "lodash/isEmpty";
 import iconFetcher from "../../../helper/iconFetcher";
@@ -22,7 +22,7 @@ const selector = (s: ReactFlowState) => ({
 });
 
 const ResponseNode = memo(
-  ({ id, data, selected }: NodeProps<FlowsDataTypes>) => {
+  ({ id, data, selected }: NodeProps<FlowsNodeDataTypes>) => {
     const {
       label,
       icon,
