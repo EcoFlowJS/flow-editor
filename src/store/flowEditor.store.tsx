@@ -2,7 +2,8 @@ import {
   FlowEditorSettingsConfigurations,
   FlowsConfigurations,
   FlowsConfigurationsDrawer,
-  FlowsDataTypes,
+  FlowsEdgeDataTypes,
+  FlowsNodeDataTypes,
   NodeConfiguration,
 } from "@ecoflow/types";
 import { atom } from "jotai";
@@ -19,8 +20,10 @@ const flowEditorSettings = atom<FlowEditorSettingsConfigurations>(
 );
 
 const currentFlow = atom<string>("");
-const currentFlowNodes = atom<Node<FlowsDataTypes, string | undefined>[]>([]);
-const currentFlowEdges = atom<Edge<any>[]>([]);
+const currentFlowNodes = atom<Node<FlowsNodeDataTypes, string | undefined>[]>(
+  []
+);
+const currentFlowEdges = atom<Edge<FlowsEdgeDataTypes>[]>([]);
 const currentFlowConfigurations = atom<NodeConfiguration[]>([]);
 
 export {
