@@ -15,6 +15,7 @@ import { useSetAtom } from "jotai";
 import { errorNotification } from "../../../store/notification.store";
 import FlowEditorSettingsDropdownMenu from "./FlowEditorSettingsDropdownMenu/FlowEditorSettingsDropdownMenu.component";
 import { FaGears } from "react-icons/fa6";
+import { currentFlow } from "../../../store/flowEditor.store";
 
 interface FlowHeaderProps {
   onFlowSelect?: (flowName: string) => void;
@@ -27,6 +28,7 @@ export default function FlowHeader({
 }: FlowHeaderProps) {
   const flowHandlers = flowEditorHandlers();
   const [activeKey, setActiveKey] = useState<string>("");
+  const setCurrentFlow = useSetAtom(currentFlow);
   const [nameFormValue, setNameFormValue] = useState({ flowName: "" });
   const [flows, setFlows] = useState(
     Object.keys(flowHandlers.flowEditorValue).length > 0
@@ -103,7 +105,10 @@ export default function FlowHeader({
     }
   }, [disabled]);
 
-  useEffect(() => onFlowSelect(activeKey), [activeKey]);
+  useEffect(() => {
+    setCurrentFlow(activeKey);
+    onFlowSelect(activeKey);
+  }, [activeKey]);
 
   useEffect(() => {
     if (!addRenameOpen.show) setNameFormValue({ flowName: "" });
