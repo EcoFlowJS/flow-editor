@@ -148,7 +148,10 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
                 );
             });
 
-        return updatedEdge;
+        return updatedEdge.filter(
+          (edge, index, edges) =>
+            edges.indexOf(edges.filter((e) => e.id === edge.id)[0]) === index
+        );
       });
     },
     [nodes, edges]
@@ -209,6 +212,19 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
       });
     },
     [nodes, edges]
+  );
+
+  const onNodesDelete = useCallback(
+    (nodeLists: Node[]) => {
+      const deletedNodeIDs = nodeLists.map((node) => node.id);
+      setNodeConfigurations((nodeConfigurations) =>
+        nodeConfigurations.filter(
+          (nodeConfiguration) =>
+            !deletedNodeIDs.includes(nodeConfiguration.nodeID)
+        )
+      );
+    },
+    [nodes, nodeConfigurations]
   );
 
   const onDragOver = useCallback((event: DragEvent<HTMLDivElement>) => {
@@ -366,6 +382,7 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onEdgesDelete={onEdgesDelete}
+            onNodesDelete={onNodesDelete}
             onConnect={onConnect}
             onInit={setReactFlowInstance}
             onDrop={disabled ? undefined : onDrop}

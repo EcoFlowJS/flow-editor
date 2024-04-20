@@ -1,46 +1,31 @@
-import {
-  ApiResponse,
-  ModuleSpecsInputs,
-  ModuleSpecsInputsTypeOptions,
-  NodeConfiguration,
-} from "@ecoflow/types";
+import { ModuleSpecsInputs, NodeConfiguration } from "@ecoflow/types";
 import { useEffect, useState } from "react";
-import {
-  CheckPicker,
-  Checkbox,
-  DatePicker,
-  FlexboxGrid,
-  Heading,
-  Input,
-  InputGroup,
-  InputNumber,
-  Panel,
-  Radio,
-  RadioGroup,
-  SelectPicker,
-  Toggle,
-  Text,
-} from "rsuite";
-import getDB_Connections from "../../../../../service/schema/getDB_Connections.service";
-import { ItemDataType } from "rsuite/esm/MultiCascadeTree";
-import { Editor } from "@monaco-editor/react";
-import { InputPassword } from "@ecoflow/components-lib";
+import { FlexboxGrid, Text } from "rsuite";
 import isUndefined from "lodash/isUndefined";
 import isEmpty from "lodash/isEmpty";
-import QueryStringParameters from "./QueryStringParameters/QueryStringParameters.component";
-import URLParameters from "./URLParameters/URLParameters.component";
+import ListBox from "./ListBox/ListBox.component";
+import Range from "./Range/Range.component";
+import Radio from "./Radio/Radio.component";
+import Checkbox from "./Checkbox/Checkbox.component";
+import HiddenString from "./HiddenString/HiddenString.component";
+import StringInput from "./StringInput/StringInput.component";
+import NumberInput from "./NumberInput/NumberInput.component";
+import DateTime from "./DateTime/DateTime.component";
+import CheckPicker from "./CheckPicker/CheckPicker.component";
+import Toggle from "./Toggle/Toggle.component";
+import CodeEditor from "./CodeEditor/CodeEditor.component";
+import SelectPicker from "./SelectPicker/SelectPicker.component";
+import RouteInput from "./RouteInput/RouteInput.component";
 
 interface NodeInputsProps {
   inputSpecs: ModuleSpecsInputs;
   nodeConfigurations?: NodeConfiguration["configs"];
-  isEndNode?: boolean;
   onChange?: (id: string, validated: boolean, value: any) => void;
 }
 
 export default function NodeInputs({
   inputSpecs,
   nodeConfigurations,
-  isEndNode = false,
   onChange = () => {},
 }: NodeInputsProps) {
   const {
@@ -50,6 +35,7 @@ export default function NodeInputs({
     methods,
     required,
     radioValues,
+    listBoxSorting,
     pickerOptions: inputPickerOptions,
     defaultValue,
   } = inputSpecs;
@@ -71,20 +57,19 @@ export default function NodeInputs({
       ? []
       : "";
   const [inputValue, setInputValue] = useState(initialValue);
-  const [pickerOptions, setPickerOptions] = useState<string[]>([]);
-  const [isLoadingFetchPicker, setLoadingFetchPicker] = useState(false);
-  const [codeValue, setCodeValue] = useState({
+  const [codeValue, setCodeValue] = useState<{
+    value?: string;
+    validate: boolean;
+  }>({
     value:
-      type === "Code" && defaultValue
-        ? (defaultValue as string | undefined)
+      type === "Code"
+        ? inputValue[name].value ||
+          (defaultValue as string | undefined) ||
+          "\nreturn payload;"
         : "\nreturn payload;",
     validate: true,
   });
   const [errorMessage, setErrorMessage] = useState("");
-
-  const isPickerOptionsIsString = (
-    pickerOptions: String[] | ModuleSpecsInputsTypeOptions[]
-  ): pickerOptions is string[] => typeof pickerOptions[0] === "string";
 
   const updateInputValue = (
     value?:
@@ -101,40 +86,8 @@ export default function NodeInputs({
     setInputValue(updateValue);
   };
 
-  const fetchPickerOptions = () => {
-    if (type === "DB_Selector") {
-      setLoadingFetchPicker(true);
-      getDB_Connections().then(
-        (response: ApiResponse) => {
-          setLoadingFetchPicker(false);
-          if (response.success) setPickerOptions(response.payload);
-        },
-        (reject: ApiResponse) => {
-          setLoadingFetchPicker(false);
-          if (reject.error) console.error(reject.payload);
-        }
-      );
-    }
-    if (type === "Methods") {
-      setLoadingFetchPicker(true);
-      setPickerOptions(methods as string[]);
-      setLoadingFetchPicker(false);
-    }
-
-    if (
-      (type === "SelectPicker" || type === "CheckPicker") &&
-      inputPickerOptions
-    ) {
-      setLoadingFetchPicker(true);
-      setPickerOptions(
-        isPickerOptionsIsString(inputPickerOptions) ? inputPickerOptions : []
-      );
-      setLoadingFetchPicker(false);
-    }
-  };
-
-  const updateResponse = (validated: boolean, value: any, id = name) =>
-    onChange(id, validated, value);
+  const updateResponse = (validated: boolean, value: any) =>
+    onChange(name, validated, value);
 
   useEffect(() => {
     const value = type === "Code" ? codeValue : inputValue[name];
@@ -192,6 +145,12 @@ export default function NodeInputs({
             value
           );
         break;
+      case "ListBox":
+        setErrorMessage("");
+        if (isRequired && !(value.length > 0))
+          setErrorMessage("List must have at least a value");
+        updateResponse(required ? value.length > 0 : true, value);
+        break;
       default:
         setErrorMessage("");
         if (isRequired && isEmpty(value)) {
@@ -203,241 +162,111 @@ export default function NodeInputs({
     }
   }, [inputValue[name], codeValue]);
 
-  useEffect(() => fetchPickerOptions(), []);
-
   return (
     <>
-      <FlexboxGrid
-        justify="space-between"
-        align="middle"
-        style={{ padding: "6px 0" }}
-      >
-        <FlexboxGrid.Item
-          {...(type === "Code" ? { colspan: 24 } : { style: { width: 120 } })}
-        >
-          {type === "Code" ? (
-            <Heading style={{ padding: "5px 10px" }}>{label}</Heading>
-          ) : (
-            `${label} :`
-          )}
-        </FlexboxGrid.Item>
-        <FlexboxGrid.Item
-          {...(type === "Code"
-            ? { colspan: 24 }
-            : type === "Toggle"
-            ? {}
-            : { style: { width: 300 } })}
-        >
+      <FlexboxGrid justify="space-between" style={{ padding: "6px 0" }}>
+        <FlexboxGrid.Item colspan={24}>
           {type === "Route" ? (
-            <InputGroup>
-              <InputGroup.Addon>/</InputGroup.Addon>
-              <Input
-                type="text"
-                name={name}
-                autoComplete="off"
-                spellCheck={false}
-                value={inputValue[name]}
-                onChange={updateInputValue}
-              />
-            </InputGroup>
+            <RouteInput
+              label={label}
+              inputValue={inputValue[name]}
+              onUpdate={updateInputValue}
+            />
           ) : type === "DB_Selector" ||
             type === "Methods" ||
             type === "SelectPicker" ? (
             <SelectPicker
-              block
-              loading={isLoadingFetchPicker}
-              data={
-                type === "SelectPicker" && inputPickerOptions
-                  ? isPickerOptionsIsString(inputPickerOptions)
-                    ? pickerOptions.map((item) => ({
-                        label: item,
-                        value: item,
-                      }))
-                    : (inputPickerOptions as ItemDataType<string>[])
-                  : pickerOptions.map((item) => ({
-                      label: item,
-                      value: item,
-                    }))
-              }
-              onOpen={
-                type === "SelectPicker"
-                  ? inputPickerOptions &&
-                    isPickerOptionsIsString(inputPickerOptions)
-                    ? fetchPickerOptions
-                    : undefined
-                  : fetchPickerOptions
-              }
-              onClean={() => updateInputValue(null)}
-              onSelect={updateInputValue}
-              value={inputValue[name]}
+              label={label}
+              type={type}
+              inputPickerOptions={inputPickerOptions}
+              methods={methods}
+              inputValue={inputValue[name]}
+              onUpdate={updateInputValue}
             />
           ) : type === "Code" ? (
-            <Panel
-              bodyFill
-              bordered
-              style={{
-                backgroundColor: "#1e1e1e",
-                padding: "10px 0",
-                overflow: "visible",
+            <CodeEditor
+              label={label}
+              codeEditorValue={codeValue}
+              onValidate={(result) => {
+                if (result.length === 0) {
+                  setErrorMessage("");
+                  setCodeValue((val) => ({ ...val, validate: true }));
+                } else {
+                  setErrorMessage("Invalid Code");
+                  setCodeValue((val) => ({ ...val, validate: false }));
+                }
               }}
-            >
-              <Editor
-                options={{
-                  showUnused: true,
-                  minimap: { enabled: false },
-                  fontSize: 16,
-                }}
-                wrapperProps={{ fontSize: 20 }}
-                height={500}
-                language="javascript"
-                theme="vs-dark"
-                onChange={(value) => setCodeValue((val) => ({ ...val, value }))}
-                onValidate={(result) => {
-                  if (result.length === 0) {
-                    setErrorMessage("");
-                    setCodeValue((val) => ({ ...val, validate: true }));
-                  } else {
-                    setErrorMessage("Invalid Code");
-                    setCodeValue((val) => ({ ...val, validate: false }));
-                  }
-                }}
-                value={codeValue.value}
-              />
-            </Panel>
+              onUpdateCodeValue={setCodeValue}
+            />
           ) : type === "Toggle" ? (
             <Toggle
-              checked={inputValue[name] as boolean}
-              onChange={updateInputValue}
+              label={label}
+              inputValue={inputValue[name]}
+              onUpdate={updateInputValue}
             />
           ) : type === "CheckPicker" ? (
             <CheckPicker
-              block
-              loading={isLoadingFetchPicker}
-              data={
-                type === "CheckPicker" && inputPickerOptions
-                  ? isPickerOptionsIsString(inputPickerOptions)
-                    ? pickerOptions.map((item) => ({
-                        label: item,
-                        value: item,
-                      }))
-                    : (inputPickerOptions as ItemDataType<string>[])
-                  : pickerOptions.map((item) => ({
-                      label: item,
-                      value: item,
-                    }))
-              }
-              onOpen={
-                type === "CheckPicker"
-                  ? inputPickerOptions &&
-                    isPickerOptionsIsString(inputPickerOptions)
-                    ? fetchPickerOptions
-                    : undefined
-                  : fetchPickerOptions
-              }
-              onClean={() => updateInputValue([])}
-              onSelect={updateInputValue}
-              value={inputValue[name]}
+              label={label}
+              inputPickerOptions={inputPickerOptions}
+              inputValue={inputValue[name]}
+              onUpdate={updateInputValue}
             />
           ) : type === "Date" || type === "Time" || type === "DateTime" ? (
-            <DatePicker
-              block
-              format={
-                type === "Date"
-                  ? "dd/MM/yyyy"
-                  : type === "Time"
-                  ? "hh:mm:ss aa"
-                  : "dd/MM/yyyy hh:mm:ss aa"
-              }
-              showMeridian
-              value={inputValue[name]}
-              onChange={updateInputValue}
-              onClean={() => updateInputValue(null)}
+            <DateTime
+              type={type}
+              label={label}
+              inputValue={inputValue[name]}
+              onUpdate={updateInputValue}
             />
           ) : type === "Number" ? (
-            <InputNumber
-              name={name}
-              autoComplete="off"
-              spellCheck={false}
-              value={inputValue[name]}
-              onChange={updateInputValue}
+            <NumberInput
+              label={label}
+              inputValue={inputValue[name]}
+              onUpdate={updateInputValue}
             />
           ) : type === "String" ? (
-            <Input
-              autoComplete="off"
-              spellCheck={false}
-              value={inputValue[name]}
-              onChange={updateInputValue}
+            <StringInput
+              label={label}
+              inputValue={inputValue[name]}
+              onUpdate={updateInputValue}
             />
           ) : type === "HiddenString" ? (
-            <InputPassword
-              autoComplete="off"
-              spellCheck={false}
-              value={inputValue[name]}
-              onChange={updateInputValue}
+            <HiddenString
+              label={label}
+              inputValue={initialValue[name]}
+              onUpdate={updateInputValue}
             />
           ) : type === "Checkbox" ? (
             <Checkbox
-              checked={inputValue[name]}
-              value={inputValue[name]}
-              onChange={(value) => updateInputValue(!value)}
+              label={label}
+              inputValue={inputValue[name]}
+              onUpdate={updateInputValue}
             />
           ) : type === "Radio" ? (
-            <RadioGroup
-              name="radio-group"
-              value={inputValue[name]}
-              onChange={updateInputValue}
-            >
-              {radioValues && Array.isArray(radioValues) ? (
-                radioValues.map((value, key) => (
-                  <Radio key={key} value={value}>
-                    {value}
-                  </Radio>
-                ))
-              ) : radioValues && typeof radioValues === "string" ? (
-                <Radio value={radioValues}>{radioValues}</Radio>
-              ) : (
-                <></>
-              )}
-            </RadioGroup>
+            <Radio
+              label={label}
+              radioValues={radioValues}
+              inputValue={inputValue[name]}
+              onUpdate={updateInputValue}
+            />
           ) : type === "Range" ? (
-            <InputGroup>
-              <InputNumber
-                autoComplete="off"
-                spellCheck={false}
-                value={inputValue[name].start}
-                onChange={(start) =>
-                  updateInputValue({
-                    ...inputValue[name],
-                    start,
-                    end: inputValue[name].end
-                      ? Number(start!) > Number(inputValue[name].end)
-                        ? Number(start!).toString()
-                        : inputValue[name].end
-                      : undefined,
-                  })
-                }
-              />
-              <InputGroup.Addon>to</InputGroup.Addon>
-              <InputNumber
-                min={
-                  inputValue[name].start
-                    ? Number(inputValue[name].start)
-                    : undefined
-                }
-                autoComplete="off"
-                spellCheck={false}
-                value={inputValue[name].end}
-                onChange={(end) =>
-                  updateInputValue({ ...inputValue[name], end })
-                }
-              />
-            </InputGroup>
+            <Range
+              label={label}
+              inputValue={inputValue[name]}
+              onUpdate={updateInputValue}
+            />
+          ) : type === "ListBox" ? (
+            <ListBox
+              label={label}
+              listSortings={listBoxSorting}
+              listBoxLists={inputValue[name] || []}
+              onUpdate={updateInputValue}
+            />
           ) : (
-            <Input
-              autoComplete="off"
-              spellCheck={false}
-              value={inputValue[name]}
-              onChange={updateInputValue}
+            <StringInput
+              label={label}
+              inputValue={inputValue[name]}
+              onUpdate={updateInputValue}
             />
           )}
         </FlexboxGrid.Item>
@@ -454,28 +283,6 @@ export default function NodeInputs({
           {errorMessage ? <Text muted>{errorMessage}</Text> : <></>}
         </FlexboxGrid.Item>
       </FlexboxGrid>
-      {isEndNode ? (
-        <>
-          <URLParameters
-            urlParameters={
-              nodeConfigurations && nodeConfigurations["$url.params"]
-                ? nodeConfigurations["$url.params"]
-                : []
-            }
-            onUpdate={(id, value) => updateResponse(true, value, id)}
-          />
-          <QueryStringParameters
-            queryStrings={
-              nodeConfigurations && nodeConfigurations["$url.query"]
-                ? nodeConfigurations["$url.query"]
-                : []
-            }
-            onUpdate={(id, value) => updateResponse(true, value, id)}
-          />
-        </>
-      ) : (
-        <></>
-      )}
     </>
   );
 }
