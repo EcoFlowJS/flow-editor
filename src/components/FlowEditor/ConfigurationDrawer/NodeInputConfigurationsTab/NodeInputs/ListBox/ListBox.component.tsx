@@ -14,67 +14,67 @@ import {
 import { MovedItemInfo } from "rsuite/esm/List/helper/useSortHelper";
 import isEmpty from "lodash/isEmpty";
 
-interface URLParametersProps {
-  urlParameters?: string[];
-  onUpdate?: (id: string, value: string[]) => void;
+interface ListBoxProps {
+  listBoxLists?: string[];
+  listSortings?: boolean;
+  label?: string;
+  onUpdate?: (value: string[]) => void;
 }
 
-export default function URLParameters({
-  urlParameters = [],
+export default function ListBox({
+  listBoxLists = [],
+  listSortings = false,
+  label = "",
   onUpdate = () => {},
-}: URLParametersProps) {
-  const [urlParameterValue, setURLParameterValue] = useState("");
-  const [urlParameterList, setURLParameterList] =
-    useState<string[]>(urlParameters);
+}: ListBoxProps) {
+  const [listBoxListInputValue, setParameterValue] = useState("");
+  const [listBoxListValues, setListBoxLists] = useState<string[]>(listBoxLists);
 
-  const handleURLParameterAddition = () =>
-    setURLParameterList((urlParameterList) => {
+  const handleParameterAddition = () =>
+    setListBoxLists((listBoxListValues) => {
       if (
-        urlParameterList.includes(urlParameterValue.trim()) ||
-        /\s/g.test(urlParameterValue.trim()) ||
-        isEmpty(urlParameterValue)
+        listBoxListValues.includes(listBoxListInputValue.trim()) ||
+        /\s/g.test(listBoxListInputValue.trim()) ||
+        isEmpty(listBoxListInputValue)
       )
-        return urlParameterList;
-      setURLParameterValue("");
-      return [...urlParameterList, urlParameterValue.trim()];
+        return listBoxListValues;
+      setParameterValue("");
+      return [...listBoxListValues, listBoxListInputValue.trim()];
     });
 
-  const handleURLParameterAdditionKeyDown = (
+  const handleParameterAdditionKeyDown = (
     event: KeyboardEvent<HTMLInputElement>
-  ) => (event.key === "Enter" ? handleURLParameterAddition() : null);
+  ) => (event.key === "Enter" ? handleParameterAddition() : null);
 
-  const handleURLParameterRemoval = (id: number) =>
-    setURLParameterList((urlParameterList) => {
-      urlParameterList.splice(id, 1);
-      return [...urlParameterList];
+  const handleParameterRemoval = (id: number) =>
+    setListBoxLists((listBoxListValues) => {
+      listBoxListValues.splice(id, 1);
+      return [...listBoxListValues];
     });
 
-  const handleURLParameterSort = ({ oldIndex, newIndex }: MovedItemInfo) =>
-    setURLParameterList((urlParameters) => {
-      const moveData = urlParameters.splice(oldIndex, 1);
-      const newData = [...urlParameters];
+  const handleListBoxSort = ({ oldIndex, newIndex }: MovedItemInfo) =>
+    setListBoxLists((listBoxLists) => {
+      const moveData = listBoxLists.splice(oldIndex, 1);
+      const newData = [...listBoxLists];
       newData.splice(newIndex, 0, moveData[0]);
       return newData;
     });
 
-  useEffect(
-    () => onUpdate("$url.params", urlParameterList),
-    [urlParameterList]
-  );
+  useEffect(() => onUpdate(listBoxListValues), [listBoxListValues]);
   return (
-    <Panel bordered header="URL Parameters :" style={{ marginTop: 10 }}>
+    <Panel bordered header={`${label} :`} style={{ marginTop: 10 }}>
       <FlexboxGrid justify="center" align="middle">
         <FlexboxGrid.Item colspan={24}>
           <InputGroup>
             <Input
               autoComplete="off"
               spellCheck={false}
-              placeholder="URL Parameters"
-              onChange={setURLParameterValue}
-              value={urlParameterValue}
-              onKeyDown={handleURLParameterAdditionKeyDown}
+              placeholder={label}
+              onChange={setParameterValue}
+              value={listBoxListInputValue}
+              onKeyDown={handleParameterAdditionKeyDown}
             />
-            <InputGroup.Button onClick={handleURLParameterAddition}>
+            <InputGroup.Button onClick={handleParameterAddition}>
               Insert
             </InputGroup.Button>
           </InputGroup>
@@ -83,22 +83,22 @@ export default function URLParameters({
           <Divider />
         </FlexboxGrid.Item>
         <FlexboxGrid.Item colspan={22}>
-          {urlParameterList.length === 0 ? (
+          {listBoxListValues.length === 0 ? (
             <FlexboxGrid justify="center">
-              <Text muted>No URL parameters available</Text>
+              <Text muted>No {label} available</Text>
             </FlexboxGrid>
           ) : (
             <List
               bordered
-              sortable
-              onSort={handleURLParameterSort}
+              sortable={listSortings}
+              onSort={handleListBoxSort}
               style={{
                 overflow: "auto",
                 maxHeight: 300,
                 wordBreak: "break-word",
               }}
             >
-              {urlParameterList.map((value, key) => (
+              {listBoxListValues.map((value, key) => (
                 <List.Item key={key} index={key}>
                   <FlexboxGrid justify="space-between" align="middle">
                     <FlexboxGrid.Item colspan={20}>{value}</FlexboxGrid.Item>
@@ -107,7 +107,7 @@ export default function URLParameters({
                         appearance="subtle"
                         color="red"
                         icon={<IconWrapper icon={FaXmark} />}
-                        onClick={() => handleURLParameterRemoval(key)}
+                        onClick={() => handleParameterRemoval(key)}
                       />
                     </FlexboxGrid.Item>
                   </FlexboxGrid>
