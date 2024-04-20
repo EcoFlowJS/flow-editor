@@ -1,5 +1,5 @@
 import { IconWrapper } from "@ecoflow/components-lib";
-import { FlowsConfigurationsDrawer, Node } from "@ecoflow/types";
+import { FlowsConfigurationsDrawer, EcoNode } from "@ecoflow/types";
 import { GrConfigure } from "react-icons/gr";
 import { Panel, Tabs } from "rsuite";
 import NodeInputConfigurationsTab from "../NodeInputConfigurationsTab/NodeInputConfigurationsTab.component";
@@ -9,7 +9,7 @@ import NodeAppearanceTab from "../NodeAppearanceTab/NodeAppearanceTab.component"
 import { LiaObjectGroup } from "react-icons/lia";
 
 interface NodeConfigurationTabsProps {
-  moduleNode?: Node;
+  moduleNode?: EcoNode;
   nodeConfigurations?: Required<
     Pick<
       FlowsConfigurationsDrawer,
