@@ -35,13 +35,12 @@ import ConfigurationDrawer from "../ConfigurationDrawer/ConfigurationDrawer.comp
 import "reactflow/dist/style.css";
 import "./style.less";
 import defaultNodeAppearance from "../../../defaults/defaultNodeAppearance.default";
+import generateNodeID from "../../../helper/generateNodeID";
 
 interface EditorProps {
   flow?: string;
   disabled?: boolean;
 }
-let id = 0;
-const getId = (moduleID: string) => `${moduleID}_${id++}`;
 
 export default function Editor({ flow = "", disabled = false }: EditorProps) {
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
@@ -245,7 +244,7 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
         x: event.clientX,
         y: event.clientY,
       });
-      const nodeID = getId(moduleID._id);
+      const nodeID = generateNodeID();
       const newNode: Node<FlowsNodeDataTypes> = {
         id: nodeID,
         type,

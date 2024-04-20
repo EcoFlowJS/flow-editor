@@ -12,7 +12,7 @@ import drawerInitialNodeConfigurations from "../../../defaults/drawerInitialNode
 import {
   ApiResponse,
   FlowsConfigurationsDrawer,
-  Node,
+  EcoNode,
   NodeAppearanceConfigurations,
   NodeConfiguration,
 } from "@ecoflow/types";
@@ -39,7 +39,7 @@ export default function ConfigurationDrawer({
   const [flowConfigurationDrawer, setConfigurationDrawer] = useAtom(
     flowEditorConfigurationsDrawer
   );
-  const [moduleNode, setModuleNode] = useState<Node>(null);
+  const [moduleNode, setModuleNode] = useState<EcoNode>(null);
   const [nodeConfigurations, setNodeConfigurations] = useState(
     drawerInitialNodeConfigurations
   );
