@@ -187,7 +187,7 @@ export default function FlowEditorSettingsDropdownMenu(
           icon={<IconWrapper icon={TiExport} />}
           //Implementation left.
         >
-          Open Debug Console
+          Export
         </Dropdown.Item>
       </Dropdown.Menu>
     </Popover>
