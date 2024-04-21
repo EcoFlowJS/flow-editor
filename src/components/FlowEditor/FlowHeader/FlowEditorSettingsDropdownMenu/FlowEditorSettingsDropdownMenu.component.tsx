@@ -10,6 +10,7 @@ import {
 import { ApiResponse, FlowEditorSettingsConfigurations } from "@ecoflow/types";
 import { useEffect, useState } from "react";
 import updateFlowSettings from "../../../../service/flows/updateFlowSettings.service";
+import { TiExport } from "react-icons/ti";
 
 export default function FlowEditorSettingsDropdownMenu(
   {
@@ -179,6 +180,12 @@ export default function FlowEditorSettingsDropdownMenu(
         <Dropdown.Item
           icon={<IconWrapper icon={VscDebugConsole} />}
           onClick={() => openDebugConsoleDrawer(true)}
+        >
+          Open Debug Console
+        </Dropdown.Item>
+        <Dropdown.Item
+          icon={<IconWrapper icon={TiExport} />}
+          //Implementation left.
         >
           Open Debug Console
         </Dropdown.Item>
