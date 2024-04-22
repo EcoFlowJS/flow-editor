@@ -1,5 +1,6 @@
 import { DragEvent, MouseEvent } from "react";
-import { isEmpty } from "lodash";
+import isUndefined from "lodash/isUndefined";
+import isEmpty from "lodash/isEmpty";
 import { useCallback, useEffect, useState } from "react";
 import ReactFlow, {
   Background,
@@ -345,7 +346,29 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
 
   useEffect(() => {
     if (isEmpty(activeFlow) && isEmpty(lastFlow)) return;
-    setNodes(flowHandlers.flowEditorValue[activeFlow].definitions);
+    setNodes(
+      flowHandlers.flowEditorValue[activeFlow].definitions.map((definition) => {
+        if (isUndefined(definition.data.openDrawer))
+          definition.data.openDrawer = (
+            label: string,
+            configured: boolean,
+            disabled: boolean,
+            description: string,
+            appearance: NodeAppearanceConfigurations
+          ) =>
+            openConfigurationDrawer(
+              definition.id,
+              definition.data.moduleID,
+              label,
+              configured,
+              disabled,
+              description,
+              appearance
+            );
+
+        return definition;
+      })
+    );
     setEdges(flowHandlers.flowEditorValue[activeFlow].connections);
     setNodeConfigurations(
       flowHandlers.flowEditorValue[activeFlow].configurations
