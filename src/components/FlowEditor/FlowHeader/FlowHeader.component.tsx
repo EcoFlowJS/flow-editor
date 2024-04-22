@@ -30,11 +30,7 @@ export default function FlowHeader({
   const [activeKey, setActiveKey] = useState<string>("");
   const setCurrentFlow = useSetAtom(currentFlow);
   const [nameFormValue, setNameFormValue] = useState({ flowName: "" });
-  const [flows, setFlows] = useState(
-    Object.keys(flowHandlers.flowEditorValue).length > 0
-      ? Object.keys(flowHandlers.flowEditorValue)
-      : ["Flow1"]
-  );
+  const [flows, setFlows] = useState(["Flow1"]);
   const [addRenameOpen, setAddRenameOpen] = useState<{
     show: boolean;
     mode?: "ADD" | "EDIT";
@@ -113,6 +109,20 @@ export default function FlowHeader({
   useEffect(() => {
     if (!addRenameOpen.show) setNameFormValue({ flowName: "" });
   }, [addRenameOpen.show]);
+
+  useEffect(() => {
+    if (flows.length === 1 && flows[0] === "Flow1") {
+      setFlows(
+        Object.keys(flowHandlers.flowEditorValue).length > 0
+          ? Object.keys(flowHandlers.flowEditorValue)
+          : ["Flow1"]
+      );
+
+      setActiveKey((activeKey) =>
+        activeKey ? activeKey : Object.keys(flowHandlers.flowEditorValue)[0]
+      );
+    }
+  }, [flowHandlers.flowEditorValue]);
 
   return (
     <>
