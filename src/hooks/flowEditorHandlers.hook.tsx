@@ -1,6 +1,6 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { flowEditor } from "../store/flowEditor.store";
-import { Describtions } from "@ecoflow/types";
+import { Describtions, FlowsNodeDataTypes } from "@ecoflow/types";
 import { isUndefined } from "lodash";
 
 const flowEditorHandlers = () => {
@@ -47,12 +47,32 @@ const flowEditorHandlers = () => {
       return { ...flow };
     });
 
+  const updateNodeDefinitionData = (
+    nodeID: string,
+    data: Partial<FlowsNodeDataTypes>
+  ) =>
+    setFlowEditor((flowEditorValue) => {
+      const flows = Object.keys(flowEditorValue);
+      flows.forEach((flowName) => {
+        flowEditorValue[flowName].definitions = flowEditorValue[
+          flowName
+        ].definitions.map((node) => {
+          if (node.id === nodeID) node.data = { ...node.data, ...data };
+
+          return node;
+        });
+      });
+
+      return { ...flowEditorValue };
+    });
+
   return {
     flowEditorValue,
     addFlow,
     dropFlow,
     renameFlow,
     updateFlowEditor,
+    updateNodeDefinitionData,
   };
 };
 

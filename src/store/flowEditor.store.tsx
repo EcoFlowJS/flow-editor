@@ -10,6 +10,8 @@ import { atom } from "jotai";
 import defaultFlowEditorSettings from "../defaults/defaultFlowEditorSettings.default";
 import { Edge, Node } from "reactflow";
 
+const isLoadingFlowEditor = atom({ flow: true, flowSettings: true });
+
 const flowEditor = atom<FlowsConfigurations>({});
 const flowEditorConfigurationsDrawer = atom<FlowsConfigurationsDrawer>({
   show: false,
@@ -27,6 +29,7 @@ const currentFlowEdges = atom<Edge<FlowsEdgeDataTypes>[]>([]);
 const currentFlowConfigurations = atom<NodeConfiguration[]>([]);
 
 export {
+  isLoadingFlowEditor,
   flowEditor,
   flowEditorConfigurationsDrawer,
   debugConsoleDrawer,

@@ -1,12 +1,7 @@
-import { FlexboxGrid, IconButton, Tooltip, Whisper } from "rsuite";
+import { FlexboxGrid, Form, IconButton, Tooltip, Whisper } from "rsuite";
 import ResponsiveNav from "@rsuite/responsive-nav";
 import { KeyboardEvent, useEffect, useState } from "react";
-import {
-  AlertModal,
-  IconWrapper,
-  Form,
-  FormGroup,
-} from "@ecoflow/components-lib";
+import { AlertModal, IconWrapper, FormGroup } from "@ecoflow/components-lib";
 import { BiSolidLayerPlus } from "react-icons/bi";
 import "./style.less";
 import flowEditorHandlers from "../../../hooks/flowEditorHandlers.hook";

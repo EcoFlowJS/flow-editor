@@ -11,24 +11,88 @@ import { IconWrapper } from "@ecoflow/components-lib";
 import { GrDeploy } from "react-icons/gr";
 import { RiNodeTree, RiRestartLine } from "react-icons/ri";
 import { TbBinaryTree2 } from "react-icons/tb";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import {
   currentFlow,
   currentFlowConfigurations,
   currentFlowEdges,
   currentFlowNodes,
-  flowEditor,
+  isLoadingFlowEditor,
 } from "../../../store/flowEditor.store";
 import deployFlowConfigurations from "../../../service/flows/deployFlowConfigurations.service";
-import { FlowsConfigurations } from "@ecoflow/types";
+import { ApiResponse, FlowsConfigurations } from "@ecoflow/types";
+import isAllNodesConfigured from "../../../helper/isAllNodesConfigured";
+import {
+  errorNotification,
+  successNotification,
+} from "../../../store/notification.store";
+import isString from "lodash/isString";
+import flowEditorHandlers from "../../../hooks/flowEditorHandlers.hook";
 
 export default function DeployButton() {
-  const flowConfigurations = useAtomValue(flowEditor);
+  const flowHandlers = flowEditorHandlers();
+  const flowConfigurations = flowHandlers.flowEditorValue;
 
   const activeFlow = useAtomValue(currentFlow);
   const activeFlowNodes = useAtomValue(currentFlowNodes);
   const activeFlowEdges = useAtomValue(currentFlowEdges);
   const activeFlowConfigurations = useAtomValue(currentFlowConfigurations);
+
+  const setErrorNotification = useSetAtom(errorNotification);
+  const setSuccessNotification = useSetAtom(successNotification);
+  const setFlowLoading = useSetAtom(isLoadingFlowEditor);
+
+  const clearLoadingsAndErrors = () => {
+    setFlowLoading((isLoading) => ({ ...isLoading, flow: false }));
+    const nodeIDs: string[] = [];
+    Object.keys(flowHandlers.flowEditorValue).forEach((key) => {
+      flowHandlers.flowEditorValue[key].definitions.forEach((node) =>
+        nodeIDs.push(node.id)
+      );
+    });
+    nodeIDs.forEach((nodeID: string) =>
+      flowHandlers.updateNodeDefinitionData(nodeID, { isError: false })
+    );
+  };
+
+  const deploy = (flowConfigurations: FlowsConfigurations) => {
+    setFlowLoading((isLoading) => ({ ...isLoading, flow: true }));
+    deployFlowConfigurations(flowConfigurations).then(
+      (response: ApiResponse) => {
+        clearLoadingsAndErrors();
+        if (response.success)
+          setSuccessNotification({
+            show: true,
+            placement: "bottomStart",
+            header: "Deployment Success",
+            message: isString(response.payload)
+              ? response.payload
+              : response.payload.msg,
+          });
+      },
+      (reject: ApiResponse) => {
+        clearLoadingsAndErrors();
+        if (reject.error) {
+          setErrorNotification({
+            show: true,
+            placement: "bottomStart",
+            header: "Deploying flow Error",
+            message: isString(reject.payload)
+              ? reject.payload
+              : reject.payload.msg,
+          });
+
+          //TODO: set error nodes
+          console.log(reject.payload.nodesID);
+
+          if (reject.payload.nodesID)
+            reject.payload.nodesID.forEach((nodeID: string) =>
+              flowHandlers.updateNodeDefinitionData(nodeID, { isError: true })
+            );
+        }
+      }
+    );
+  };
 
   const handleDeployFull = () => {
     flowConfigurations[activeFlow] = {
@@ -37,10 +101,24 @@ export default function DeployButton() {
       configurations: activeFlowConfigurations,
     };
 
-    deployFlowConfigurations(flowConfigurations).then(
-      console.log,
-      console.error
-    );
+    flowHandlers.updateFlowEditor(activeFlow, {
+      definitions: activeFlowNodes,
+      connections: activeFlowEdges,
+      configurations: activeFlowConfigurations,
+    });
+
+    if (!isAllNodesConfigured(flowConfigurations)) {
+      setErrorNotification({
+        show: true,
+        placement: "bottomStart",
+        header: "Deploying flow Error",
+        message:
+          "All nodes not configured. Please configure it before deploying.",
+      });
+      return;
+    }
+
+    deploy(flowConfigurations);
   };
 
   const handleDeployCurrentFlow = () => {
@@ -51,10 +129,18 @@ export default function DeployButton() {
       configurations: activeFlowConfigurations,
     };
 
-    deployFlowConfigurations(flowConfigurations).then(
-      console.log,
-      console.error
-    );
+    if (!isAllNodesConfigured(flowConfigurations)) {
+      setErrorNotification({
+        show: true,
+        placement: "bottomStart",
+        header: "Deploying flow Error",
+        message:
+          "All nodes not configured. Please configure it before deploying.",
+      });
+      return;
+    }
+
+    deploy(flowConfigurations);
   };
 
   return (
