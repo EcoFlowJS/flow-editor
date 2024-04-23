@@ -26,8 +26,6 @@ import baseSocketIOHndlers from "./baseSocketIO.handlers";
 import userSignoutService from "../../service/user/userSignout.service";
 import useNavigator from "../../utils/useNavigator/useNavigator";
 import Loading from "../../components/Loading/Loading.component";
-import flowEditorHandlers from "../../hooks/flowEditorHandlers.hook";
-import isEmpty from "lodash/isEmpty";
 
 export default function BaseLayout() {
   //Redirect Handler
@@ -36,9 +34,6 @@ export default function BaseLayout() {
   };
   const navigate = useNavigator();
   const location = useLocation();
-
-  //FlowEditor handler
-  const flowHandlers = flowEditorHandlers();
 
   //Initialize Status State
   const [isLoading, setLoading] = useState(true);
@@ -206,11 +201,9 @@ export default function BaseLayout() {
 
   //Flow state change
   useEffect(() => {
-    if (!isEmpty(flowHandlers.flowEditorValue))
-      window.onbeforeunload = (event: BeforeUnloadEvent) =>
-        event.preventDefault();
-    else window.onbeforeunload = null;
-  }, [flowHandlers.flowEditorValue]);
+    window.onbeforeunload = (event: BeforeUnloadEvent) =>
+      event.preventDefault();
+  }, []);
 
   return (
     <>

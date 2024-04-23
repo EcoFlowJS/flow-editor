@@ -12,7 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ecoflow/components-lib": "^0.1.0",
+    "@ecoflow/components-lib": "^0.1.1",
     "@ecoflow/types": "^0.0.1",
     "@koa/router": "^11.0.2",
     "@monaco-editor/react": "^4.6.0",

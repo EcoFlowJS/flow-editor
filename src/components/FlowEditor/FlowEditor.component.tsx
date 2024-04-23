@@ -2,16 +2,22 @@ import { FlexboxGrid, Loader } from "rsuite";
 import FlowHeader from "./FlowHeader/FlowHeader.component";
 import { useEffect, useState } from "react";
 import Editor from "./Editor/Editor.component";
-import { useSetAtom } from "jotai";
-import { flowEditor, flowEditorSettings } from "../../store/flowEditor.store";
+import { useAtom, useSetAtom } from "jotai";
+import {
+  flowEditor,
+  flowEditorSettings,
+  isLoadingFlowEditor,
+} from "../../store/flowEditor.store";
 import getFlows from "../../service/flows/getFlows.services";
 import flowEditorHandlers from "../../hooks/flowEditorHandlers.hook";
 import fetchFlowSetting from "../../service/flows/fetchFlowSetting.service";
 import { ApiResponse } from "@ecoflow/types";
+import { LoadingSquareCircle } from "@ecoflow/components-lib";
+import "./style.less";
 
 export default function FlowEditor() {
   const hnl = flowEditorHandlers();
-  const [isLoading, setLoading] = useState({ flow: true, flowSettings: true });
+  const [isLoading, setLoading] = useAtom(isLoadingFlowEditor);
   const [flow, setFlow] = useState("");
   const setFlows = useSetAtom(flowEditor);
   const setFlowSettings = useSetAtom(flowEditorSettings);
@@ -57,7 +63,14 @@ export default function FlowEditor() {
     <>
       <FlexboxGrid style={{ alignContent: "stretch", position: "relative" }}>
         {isLoading.flow || isLoading.flowSettings ? (
-          <Loader backdrop center content="vertical Loading..." vertical />
+          <Loader
+            className="FlowEditor-loading"
+            style={{ zIndex: 99999 }}
+            backdrop
+            center
+            content={<LoadingSquareCircle loaderColor="#FFF" />}
+            vertical
+          />
         ) : (
           <></>
         )}

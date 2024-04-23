@@ -17,6 +17,7 @@ const RequestNode = memo(
       disabled,
       description,
       appearance,
+      isError,
       openDrawer,
     } = data;
     return (
@@ -43,7 +44,7 @@ const RequestNode = memo(
                 <div
                   className={`node ${selected ? "selected" : ""} ${
                     disabled ? "flow-node-disabled" : ""
-                  }`}
+                  } ${isError ? "node-error" : ""}`}
                   style={
                     !isUndefined(appearance.label) && !appearance.label
                       ? { width: 30, minHeight: 30 }
@@ -130,7 +131,7 @@ const RequestNode = memo(
                 <div
                   className={`node ${selected ? "selected" : ""} ${
                     disabled ? "flow-node-disabled" : ""
-                  }`}
+                  } ${isError ? "node-error" : ""}`}
                   style={
                     !isUndefined(appearance.label) && !appearance.label
                       ? { width: 30, minHeight: 30 }
