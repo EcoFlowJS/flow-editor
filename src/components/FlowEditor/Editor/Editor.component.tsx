@@ -389,24 +389,25 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
   );
 
   useEffect(() => {
-    setNodes((nodes) => {
-      const nodeIDs = flowHandlers.flowEditorValue[activeFlow]?.definitions.map(
-        (definition) => definition.id
-      );
+    if (!isUndefined(flowHandlers.flowEditorValue[activeFlow]?.definitions))
+      setNodes((nodes) => {
+        const nodeIDs = flowHandlers.flowEditorValue[
+          activeFlow
+        ].definitions.map((definition) => definition.id);
 
-      nodes.map((node) => {
-        if (nodeIDs.includes(node.id)) {
-          const updatedNode = flowHandlers.flowEditorValue[
-            activeFlow
-          ]?.definitions.find((n) => n.id === node.id)!;
-          node.data = updatedNode.data;
-        }
+        nodes.map((node) => {
+          if (nodeIDs.includes(node.id)) {
+            const updatedNode = flowHandlers.flowEditorValue[
+              activeFlow
+            ].definitions.find((n) => n.id === node.id)!;
+            node.data = updatedNode.data;
+          }
 
-        return node;
+          return node;
+        });
+
+        return [...nodes];
       });
-
-      return [...nodes];
-    });
   }, [flowHandlers.flowEditorValue[activeFlow]?.definitions]);
 
   return (
