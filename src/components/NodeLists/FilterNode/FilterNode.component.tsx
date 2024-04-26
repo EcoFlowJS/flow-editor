@@ -2,11 +2,12 @@ import { IconWrapper } from "@ecoflow/components-lib";
 import { PiMagnifyingGlassBold } from "react-icons/pi";
 import { Input, InputGroup } from "rsuite";
 import { PrependParameters } from "rsuite/esm/@types/utils";
+import { ChangeEventHandler } from "react";
 import "./style.less";
 
 interface FilterNodeProps {
   onChange?: PrependParameters<
-    React.ChangeEventHandler<HTMLInputElement>,
+    ChangeEventHandler<HTMLInputElement>,
     [value: string]
   >;
 }
