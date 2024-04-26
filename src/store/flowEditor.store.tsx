@@ -1,6 +1,6 @@
 import {
   FlowEditorSettingsConfigurations,
-  FlowsConfigurations,
+  FlowsDescription,
   FlowsConfigurationsDrawer,
   FlowsEdgeDataTypes,
   FlowsNodeDataTypes,
@@ -12,7 +12,7 @@ import { Edge, Node } from "reactflow";
 
 const isLoadingFlowEditor = atom({ flow: true, flowSettings: true });
 
-const flowEditor = atom<FlowsConfigurations>({});
+const flowEditor = atom<FlowsDescription>({});
 const flowEditorConfigurationsDrawer = atom<FlowsConfigurationsDrawer>({
   show: false,
 });

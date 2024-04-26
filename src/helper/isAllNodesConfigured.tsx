@@ -1,13 +1,13 @@
 import {
   Describtions,
   FlowDefinitions,
-  FlowsConfigurations,
+  FlowsDescription,
   Nodes,
 } from "@ecoflow/types";
 import has from "lodash/has";
 
 const isAllNodesConfigured = (
-  definitions: FlowDefinitions | FlowsConfigurations
+  definitions: FlowDefinitions | FlowsDescription
 ): boolean => {
   const nodes: Nodes = [];
   Object.keys(definitions).map((key) => {

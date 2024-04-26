@@ -20,7 +20,7 @@ import {
   isLoadingFlowEditor,
 } from "../../../store/flowEditor.store";
 import deployFlowConfigurations from "../../../service/flows/deployFlowConfigurations.service";
-import { ApiResponse, FlowsConfigurations } from "@ecoflow/types";
+import { ApiResponse, FlowsDescription } from "@ecoflow/types";
 import isAllNodesConfigured from "../../../helper/isAllNodesConfigured";
 import {
   errorNotification,
@@ -55,7 +55,7 @@ export default function DeployButton() {
     );
   };
 
-  const deploy = (flowConfigurations: FlowsConfigurations) => {
+  const deploy = (flowConfigurations: FlowsDescription) => {
     setFlowLoading((isLoading) => ({ ...isLoading, flow: true }));
     deployFlowConfigurations(flowConfigurations).then(
       (response: ApiResponse) => {
@@ -81,9 +81,6 @@ export default function DeployButton() {
               ? reject.payload
               : reject.payload.msg,
           });
-
-          //TODO: set error nodes
-          console.log(reject.payload.nodesID);
 
           if (reject.payload.nodesID)
             reject.payload.nodesID.forEach((nodeID: string) =>
@@ -122,7 +119,7 @@ export default function DeployButton() {
   };
 
   const handleDeployCurrentFlow = () => {
-    const flowConfigurations: FlowsConfigurations = Object.create({});
+    const flowConfigurations: FlowsDescription = Object.create({});
     flowConfigurations[activeFlow] = {
       definitions: activeFlowNodes,
       connections: activeFlowEdges,
