@@ -8,7 +8,7 @@ import {
   flowEditorSettings,
 } from "../../../../store/flowEditor.store";
 import { ApiResponse, FlowEditorSettingsConfigurations } from "@ecoflow/types";
-import { useEffect, useState } from "react";
+import { HTMLAttributes, RefCallback, useEffect, useState } from "react";
 import updateFlowSettings from "../../../../service/flows/updateFlowSettings.service";
 import { TiExport } from "react-icons/ti";
 
@@ -19,12 +19,12 @@ export default function FlowEditorSettingsDropdownMenu(
     className,
   }: PositionChildProps &
     Pick<
-      React.HTMLAttributes<HTMLElement>,
+      HTMLAttributes<HTMLElement>,
       "id" | "onMouseEnter" | "onMouseLeave"
     > & {
       onClose: (delay?: number) => NodeJS.Timeout | void;
     },
-  ref: React.RefCallback<HTMLElement>
+  ref: RefCallback<HTMLElement>
 ) {
   const openDebugConsoleDrawer = useSetAtom(debugConsoleDrawer);
   const [userFlowSettings, setUserFlowSettings] = useAtom(flowEditorSettings);
