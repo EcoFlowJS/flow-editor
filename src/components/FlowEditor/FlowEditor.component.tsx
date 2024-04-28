@@ -2,8 +2,9 @@ import { FlexboxGrid, Loader } from "rsuite";
 import FlowHeader from "./FlowHeader/FlowHeader.component";
 import { useEffect, useState } from "react";
 import Editor from "./Editor/Editor.component";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
+  debugConsoleDrawer,
   flowEditor,
   flowEditorSettings,
   isLoadingFlowEditor,
@@ -14,11 +15,13 @@ import fetchFlowSetting from "../../service/flows/fetchFlowSetting.service";
 import { ApiResponse } from "@ecoflow/types";
 import { LoadingSquareCircle } from "@ecoflow/components-lib";
 import "./style.less";
+import DebugConsole from "./DebugConsole/DebugConsole.component";
 
 export default function FlowEditor() {
   const hnl = flowEditorHandlers();
   const [isLoading, setLoading] = useAtom(isLoadingFlowEditor);
   const [flow, setFlow] = useState("");
+  const debugConsoleDrawerValue = useAtomValue(debugConsoleDrawer);
   const setFlows = useSetAtom(flowEditor);
   const setFlowSettings = useSetAtom(flowEditorSettings);
 
@@ -90,6 +93,7 @@ export default function FlowEditor() {
           />
         </FlexboxGrid.Item>
       </FlexboxGrid>
+      {debugConsoleDrawerValue ? <DebugConsole /> : <></>}
     </>
   );
 }
