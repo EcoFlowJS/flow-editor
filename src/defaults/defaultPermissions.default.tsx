@@ -30,6 +30,8 @@ const defaultPermissions: UserPermissions = {
   flowEditor: false,
   auditLogs: false,
   administrator: false,
+  backup: false,
+  restore: false,
 };
 
 export default defaultPermissions;
