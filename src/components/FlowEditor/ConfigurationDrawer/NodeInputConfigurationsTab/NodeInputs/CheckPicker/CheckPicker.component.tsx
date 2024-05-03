@@ -32,7 +32,12 @@ export default function CheckPicker({
     setLoadingFetchPicker(false);
   };
 
-  useEffect(() => fetchPickerOptions(), []);
+  useEffect(() => {
+    fetchPickerOptions();
+    if (inputPickerOptions.length === 0) {
+      setValue([]);
+    } else setValue(inputValue ? inputValue : []);
+  }, [inputPickerOptions]);
   useEffect(() => onUpdate(value), [value]);
 
   return (
