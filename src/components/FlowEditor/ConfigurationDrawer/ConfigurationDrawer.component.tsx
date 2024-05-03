@@ -17,6 +17,11 @@ import {
   NodeConfiguration,
 } from "@ecoflow/types";
 import "./style.less";
+import { Socket } from "socket.io-client";
+import {
+  connectSocketIO,
+  disconnectSocketIO,
+} from "../../../utils/socket.io/socket.io";
 
 interface ConfigurationDrawerProps {
   configuration: NodeConfiguration[];
@@ -35,6 +40,7 @@ export default function ConfigurationDrawer({
   configuration,
   onDrawerClosed = () => {},
 }: ConfigurationDrawerProps) {
+  const [socket, setSocket] = useState<Socket>();
   const [isLoading, setLoading] = useState(true);
   const [flowConfigurationDrawer, setConfigurationDrawer] = useAtom(
     flowEditorConfigurationsDrawer
@@ -128,7 +134,7 @@ export default function ConfigurationDrawer({
     > & {
       nodeConfiguration?: { [key: string]: any };
     }
-  ) =>
+  ) => {
     setNodeConfigurations((nodeConfigurations) => {
       return {
         ...nodeConfigurations,
@@ -142,17 +148,28 @@ export default function ConfigurationDrawer({
       };
     });
 
+    socket?.emit(
+      flowConfigurationDrawer.moduleID?._id!,
+      value["nodeConfiguration"] || {}
+    );
+  };
+
   useEffect(() => {
     if (!isOpen()) return;
+    if (socket)
+      if (!socket.hasListeners(flowConfigurationDrawer.moduleID?._id!))
+        socket.on(flowConfigurationDrawer.moduleID?._id!, (value) =>
+          setModuleNode(value)
+        );
     setLoading(true);
     fetchNodes(flowConfigurationDrawer.moduleID?._id).then(
-      (response: ApiResponse) => {
+      ({ success, payload }: ApiResponse) => {
         setLoading(false);
-        if (response.success) {
-          setModuleNode(response.payload);
+        if (success) {
+          setModuleNode(payload);
           setNodeConfigurations({
             label:
-              flowConfigurationDrawer.label === response.payload.name
+              flowConfigurationDrawer.label === payload.name
                 ? ""
                 : flowConfigurationDrawer.label!,
             configured: flowConfigurationDrawer.configured!,
@@ -166,12 +183,19 @@ export default function ConfigurationDrawer({
           });
         }
       },
-      (reject: ApiResponse) => {
+      ({ error, payload }: ApiResponse) => {
         setLoading(false);
-        console.error(reject);
+        if (error) console.error(payload);
       }
     );
   }, [flowConfigurationDrawer]);
+
+  useEffect(() => {
+    setSocket(connectSocketIO());
+    return () => {
+      if (socket) disconnectSocketIO(socket)();
+    };
+  }, []);
 
   return (
     <Drawer
