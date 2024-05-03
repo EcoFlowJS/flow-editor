@@ -1,9 +1,9 @@
-import { ModuleSpecsInputs, NodeConfiguration } from "@ecoflow/types";
+import { FlowInputSpecs, NodeConfiguration } from "@ecoflow/types";
 import { useEffect, useState } from "react";
 import NodeInputs from "./NodeInputs/NodeInputs.component";
 
 interface NodeInputConfigurationsTabProps {
-  nodeInputs?: ModuleSpecsInputs[];
+  nodeInputs?: FlowInputSpecs[];
   nodeConfigurations?: NodeConfiguration["configs"];
   onChange?: (value: NodeConfiguration["configs"]) => void;
 }

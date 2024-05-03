@@ -1,4 +1,4 @@
-import { ModuleSpecsInputs, NodeConfiguration } from "@ecoflow/types";
+import { FlowInputSpecs, NodeConfiguration } from "@ecoflow/types";
 import { useEffect, useState } from "react";
 import { FlexboxGrid, Text } from "rsuite";
 import isUndefined from "lodash/isUndefined";
@@ -18,7 +18,7 @@ import SelectPicker from "./SelectPicker/SelectPicker.component";
 import RouteInput from "./RouteInput/RouteInput.component";
 
 interface NodeInputsProps {
-  inputSpecs: ModuleSpecsInputs;
+  inputSpecs: FlowInputSpecs;
   nodeConfigurations?: NodeConfiguration["configs"];
   onChange?: (id: string, validated: boolean, value: any) => void;
 }
