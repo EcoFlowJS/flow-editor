@@ -4,6 +4,7 @@ import { FlexboxGrid, Heading, Panel } from "rsuite";
 
 interface CodeEditorProps {
   label?: string;
+  language?: string;
   codeEditorValue?: {
     value?: string;
     validate: boolean;
@@ -14,6 +15,7 @@ interface CodeEditorProps {
 
 export default function CodeEditor({
   label = "",
+  language,
   codeEditorValue,
   onValidate = () => {},
   onUpdateCodeValue = () => {},
@@ -52,7 +54,7 @@ export default function CodeEditor({
             }}
             wrapperProps={{ fontSize: 20 }}
             height={500}
-            language="javascript"
+            language={language}
             theme="vs-dark"
             onChange={(value) => setCodeValue((val) => ({ ...val, value }))}
             onValidate={onValidate}

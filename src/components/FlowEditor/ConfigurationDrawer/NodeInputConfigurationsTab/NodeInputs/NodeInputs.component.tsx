@@ -34,6 +34,7 @@ export default function NodeInputs({
     type,
     methods,
     required,
+    codeLanguage,
     radioValues,
     listBoxSorting,
     pickerOptions: inputPickerOptions,
@@ -187,6 +188,7 @@ export default function NodeInputs({
             <CodeEditor
               label={label}
               codeEditorValue={codeValue}
+              language={codeLanguage || "javascript"}
               onValidate={(result) => {
                 if (result.length === 0) {
                   setErrorMessage("");

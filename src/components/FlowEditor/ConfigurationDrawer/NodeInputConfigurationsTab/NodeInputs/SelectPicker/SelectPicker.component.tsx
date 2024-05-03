@@ -62,12 +62,7 @@ export default function SelectPicker({
     }
   };
 
-  useEffect(() => {
-    fetchPickerOptions();
-    if (inputPickerOptions.length === 0) {
-      setValue(null);
-    } else setValue(inputValue ? inputValue : null);
-  }, [inputPickerOptions]);
+  useEffect(() => fetchPickerOptions(), [inputPickerOptions]);
   useEffect(() => onUpdate(value), [value]);
 
   return (

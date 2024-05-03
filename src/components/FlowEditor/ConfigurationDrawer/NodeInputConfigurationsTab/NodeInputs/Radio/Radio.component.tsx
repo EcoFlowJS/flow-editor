@@ -16,11 +16,6 @@ export default function Radio({
 }: RadioProps) {
   const [radioValue, setRadioValue] = useState(inputValue ? inputValue : "");
 
-  useEffect(() => {
-    if (radioValues.length === 0) {
-      setRadioValue("");
-    } else setRadioValue(inputValue ? inputValue : "");
-  }, [radioValues]);
   useEffect(() => onUpdate(radioValue), [radioValue]);
 
   return (
