@@ -33,6 +33,7 @@ export default function NodeInputs({
     label,
     type,
     methods,
+    hint,
     required,
     codeLanguage,
     radioValues,
@@ -132,7 +133,10 @@ export default function NodeInputs({
         break;
       case "Range":
         setErrorMessage("");
-        if (isRequired && (isEmpty(value.start) || isEmpty(value.end))) {
+        if (
+          isRequired &&
+          (isEmpty(value.start.toString()) || isEmpty(value.end.toString()))
+        ) {
           setErrorMessage("Both Field is Required");
           updateResponse(false, value);
         } else if (isRequired && !isEmpty(value.start) && !isEmpty(value.end))
@@ -283,6 +287,18 @@ export default function NodeInputs({
             : { style: { width: 290 } })}
         >
           {errorMessage ? <Text muted>{errorMessage}</Text> : <></>}
+        </FlexboxGrid.Item>
+        <FlexboxGrid.Item
+          {...(type === "Code" ? { colspan: 24 } : { style: { width: 120 } })}
+        />
+        <FlexboxGrid.Item
+          {...(type === "Code"
+            ? { colspan: 24 }
+            : type === "Toggle"
+            ? {}
+            : { style: { width: 290 } })}
+        >
+          {hint ? <Text muted>{hint}</Text> : <></>}
         </FlexboxGrid.Item>
       </FlexboxGrid>
     </>
