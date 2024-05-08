@@ -16,10 +16,10 @@ export default function Range({
   onUpdate = () => {},
 }: RangeProps) {
   const [startValue, setStartValue] = useState(
-    inputValue && inputValue.start ? inputValue.start : ""
+    inputValue && inputValue.start.toString() ? inputValue.start.toString() : ""
   );
   const [endValue, setEndValue] = useState(
-    inputValue && inputValue.end ? inputValue.end : ""
+    inputValue && inputValue.end.toString() ? inputValue.end.toString() : ""
   );
 
   useEffect(
@@ -45,7 +45,7 @@ export default function Range({
                       : endValue
                     : ""
                 );
-                return start!;
+                return start!.toString();
               })
             }
           />
@@ -55,7 +55,7 @@ export default function Range({
             autoComplete="off"
             spellCheck={false}
             value={endValue}
-            onChange={(endValue) => setEndValue(Number(endValue))}
+            onChange={(endValue) => setEndValue(endValue!.toString())}
           />
         </InputGroup>
       </FlexboxGrid.Item>
