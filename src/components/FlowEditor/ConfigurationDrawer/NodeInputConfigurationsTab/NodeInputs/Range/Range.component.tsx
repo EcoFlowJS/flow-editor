@@ -36,18 +36,19 @@ export default function Range({
             autoComplete="off"
             spellCheck={false}
             value={startValue}
-            onChange={(start) =>
-              setStartValue(() => {
-                setEndValue((endValue) =>
-                  endValue
-                    ? Number(start!) > Number(endValue)
-                      ? Number(start!).toString()
-                      : endValue
-                    : ""
-                );
-                return start!.toString();
-              })
-            }
+            onChange={(start) => {
+              if (start)
+                setStartValue(() => {
+                  setEndValue((endValue) =>
+                    endValue
+                      ? Number(start) > Number(endValue)
+                        ? Number(start).toString()
+                        : endValue
+                      : ""
+                  );
+                  return start.toString();
+                });
+            }}
           />
           <InputGroup.Addon>to</InputGroup.Addon>
           <InputNumber
@@ -55,7 +56,9 @@ export default function Range({
             autoComplete="off"
             spellCheck={false}
             value={endValue}
-            onChange={(endValue) => setEndValue(endValue!.toString())}
+            onChange={(endValue) => {
+              if (endValue) setEndValue(endValue.toString());
+            }}
           />
         </InputGroup>
       </FlexboxGrid.Item>

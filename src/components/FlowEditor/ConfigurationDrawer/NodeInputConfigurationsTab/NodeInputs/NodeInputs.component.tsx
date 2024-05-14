@@ -135,7 +135,8 @@ export default function NodeInputs({
         setErrorMessage("");
         if (
           isRequired &&
-          (isEmpty(value.start.toString()) || isEmpty(value.end.toString()))
+          ((!isUndefined(value.start) && isEmpty(value.start.toString())) ||
+            (!isUndefined(value.end) && isEmpty(value.end.toString())))
         ) {
           setErrorMessage("Both Field is Required");
           updateResponse(false, value);
