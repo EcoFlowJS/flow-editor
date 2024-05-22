@@ -11,6 +11,7 @@ import { ApiResponse, FlowEditorSettingsConfigurations } from "@ecoflow/types";
 import { HTMLAttributes, RefCallback, useEffect, useState } from "react";
 import updateFlowSettings from "../../../../service/flows/updateFlowSettings.service";
 import { TiExport } from "react-icons/ti";
+import { exportModal } from "../../../../store/export.store";
 
 export default function FlowEditorSettingsDropdownMenu(
   {
@@ -27,6 +28,7 @@ export default function FlowEditorSettingsDropdownMenu(
   ref: RefCallback<HTMLElement>
 ) {
   const openDebugConsoleDrawer = useSetAtom(debugConsoleDrawer);
+  const openExportModal = useSetAtom(exportModal);
   const [userFlowSettings, setUserFlowSettings] = useAtom(flowEditorSettings);
   const [flowSettings, setFlowEditorSettings] =
     useState<FlowEditorSettingsConfigurations>(userFlowSettings);
@@ -185,7 +187,7 @@ export default function FlowEditorSettingsDropdownMenu(
         </Dropdown.Item>
         <Dropdown.Item
           icon={<IconWrapper icon={TiExport} />}
-          //Implementation left.
+          onClick={() => openExportModal(true)}
         >
           Export
         </Dropdown.Item>
