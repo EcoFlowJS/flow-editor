@@ -1,6 +1,7 @@
 import { Socket, io } from "socket.io-client";
+import getSocketUrl from "./getSocketUrl";
 
-const baseUrl = "http://localhost:4000/";
+const baseUrl = getSocketUrl("http://localhost:4000/systemApi/");
 
 const connectSocketIO = (roomID?: string[] | string): Socket => {
   const socket = io(baseUrl, { path: "/socket.ecoflow" });
