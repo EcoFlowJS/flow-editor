@@ -2,7 +2,10 @@ import axios from "axios";
 
 const instance = axios.create({ withCredentials: true });
 
-instance.defaults.baseURL = "http://localhost:4000/systemApi/";
+instance.defaults.baseURL =
+  process.env.NODE_ENV === "production"
+    ? window.location.origin + "/systemApi/"
+    : "http://localhost:4000/systemApi/";
 instance.defaults.headers.common["Content-Type"] = "application/json";
 instance.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
 
