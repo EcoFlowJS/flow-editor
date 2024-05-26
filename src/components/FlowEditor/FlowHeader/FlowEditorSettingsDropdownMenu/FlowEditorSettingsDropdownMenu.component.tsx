@@ -162,6 +162,7 @@ export default function FlowEditorSettingsDropdownMenu(
           <Stack justifyContent="space-between" spacing={20}>
             Pan on Mini Map
             <Toggle
+              disabled={!flowSettings.miniMap}
               loading={isLoading.panMiniMap}
               checked={flowSettings.panMiniMap}
               onChange={(value) => toggleHandler("panMiniMap", value)}

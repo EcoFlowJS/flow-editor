@@ -1,9 +1,8 @@
 {
   "name": "@ecoflow/flow-editor",
-  "version": "0.1.0",
+  "version": "0.1.25",
   "main": "./index.cjs",
   "types": "./index.d.ts",
-  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,9 +10,17 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
+  "files": [
+    "README.md",
+    "dist",
+    "index.cjs",
+    "index.d.ts",
+    "index.html",
+    "public"
+  ],
   "dependencies": {
-    "@ecoflow/components-lib": "^0.1.1",
-    "@ecoflow/types": "^0.0.20",
+    "@ecoflow/components-lib": "^0.1.25",
+    "@ecoflow/types": "^0.0.25",
     "@koa/router": "^12.0.1",
     "@monaco-editor/react": "^4.6.0",
     "@rsuite/responsive-nav": "^5.0.1",
@@ -48,5 +55,16 @@
     "eslint-plugin-react-refresh": "^0.4.3",
     "typescript": "^5.0.2",
     "vite": "^5.2.9"
-  }
+  },
+  "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EcoFlowJS/flow-editor.git"
+  },
+  "author": "EcoFlowJS",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EcoFlowJS/flow-editor/issues"
+  },
+  "homepage": "https://github.com/EcoFlowJS/flow-editor#readme"
 }
