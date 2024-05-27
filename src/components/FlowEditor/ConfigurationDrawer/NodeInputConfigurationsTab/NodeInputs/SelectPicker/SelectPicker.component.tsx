@@ -6,7 +6,7 @@ import {
 import { useEffect, useState } from "react";
 import { FlexboxGrid, SelectPicker as RsuiteSelectPicker } from "rsuite";
 import getDB_Connections from "../../../../../../service/schema/getDB_Connections.service";
-import { ItemDataType } from "rsuite/esm/@types/common";
+import { ItemDataType } from "rsuite/esm/internals/types";
 
 interface SelectPickerProps {
   label?: string;
