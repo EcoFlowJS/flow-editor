@@ -42,7 +42,7 @@ const RequestNode = memo(
             >
               <FlexboxGrid.Item>
                 <div
-                  className={`node ${selected ? "selected" : ""} ${
+                  className={`node node-request ${selected ? "selected" : ""} ${
                     disabled ? "flow-node-disabled" : ""
                   } ${isError ? "node-error" : ""}`}
                   style={
@@ -129,7 +129,7 @@ const RequestNode = memo(
             >
               <FlexboxGrid.Item>
                 <div
-                  className={`node ${selected ? "selected" : ""} ${
+                  className={`node node-request ${selected ? "selected" : ""} ${
                     disabled ? "flow-node-disabled" : ""
                   } ${isError ? "node-error" : ""}`}
                   style={

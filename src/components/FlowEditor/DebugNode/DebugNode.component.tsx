@@ -41,7 +41,7 @@ const DebugNode = memo(
             >
               <FlexboxGrid.Item>
                 <div
-                  className={`node ${selected ? "selected" : ""} ${
+                  className={`node node-debug ${selected ? "selected" : ""} ${
                     disabled ? "flow-node-disabled" : ""
                   }`}
                   style={
@@ -133,7 +133,7 @@ const DebugNode = memo(
             >
               <FlexboxGrid.Item>
                 <div
-                  className={`node ${selected ? "selected" : ""} ${
+                  className={`node node-debug ${selected ? "selected" : ""} ${
                     disabled ? "flow-node-disabled" : ""
                   }`}
                   style={

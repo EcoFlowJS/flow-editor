@@ -70,7 +70,17 @@ export default function Nodes({
       <FlexboxGrid justify="center" align="middle" style={{ width: "100%" }}>
         <FlexboxGrid.Item>
           <div
-            className="node"
+            className={`node ${
+              type === "Debug"
+                ? "node-debug"
+                : type === "Request"
+                ? "node-request"
+                : type === "Middleware"
+                ? "node-middleware"
+                : type === "Response"
+                ? "node-response"
+                : "node-unknown"
+            }`}
             draggable={draggable ? draggable : true}
             onDragStart={onDragStart ? onDragStart : onDragStartNodeHandler}
           >
