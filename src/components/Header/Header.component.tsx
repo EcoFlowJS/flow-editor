@@ -56,7 +56,7 @@ export default function Header() {
                   appearance="subtle"
                   style={{ fontSize: "1.5rem" }}
                   icon={<FaGithub />}
-                  href="https://github.com/RomelSikdar/eco-flow"
+                  href="https://github.com/EcoFlowJS/eco-flow"
                   target="_blank"
                   as="a"
                 />

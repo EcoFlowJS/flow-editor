@@ -68,9 +68,9 @@ const ResponseNode = memo(
             >
               <FlexboxGrid.Item>
                 <div
-                  className={`node ${selected ? "selected" : ""} ${
-                    disabled ? "flow-node-disabled" : ""
-                  }`}
+                  className={`node node-response ${
+                    selected ? "selected" : ""
+                  } ${disabled ? "flow-node-disabled" : ""}`}
                   style={
                     !isUndefined(appearance.label) && !appearance.label
                       ? { width: 30, minHeight: 30 }
@@ -160,9 +160,9 @@ const ResponseNode = memo(
             >
               <FlexboxGrid.Item>
                 <div
-                  className={`node ${selected ? "selected" : ""} ${
-                    disabled ? "flow-node-disabled" : ""
-                  }`}
+                  className={`node node-response ${
+                    selected ? "selected" : ""
+                  } ${disabled ? "flow-node-disabled" : ""}`}
                   style={
                     !isUndefined(appearance.label) && !appearance.label
                       ? { width: 30, minHeight: 30 }

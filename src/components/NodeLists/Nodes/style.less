@@ -4,15 +4,31 @@
 }
 
 .node {
+  color: #5a5a5a;
   position: relative;
-  background-color: rgb(148, 193, 208);
-  color: white;
   width: 130px;
   border-radius: 6px;
   cursor: move;
   border: 2px solid var(--rs-border-primary);
 
+  &.node-debug {
+    background-color: var(--node-debug-background-color);
+  }
+
+  &.node-request {
+    background-color: var(--node-request-background-color);
+  }
+
+  &.node-middleware {
+    background-color: var(--node-middleware-background-color);
+  }
+
+  &.node-response {
+    background-color: var(--node-response-background-color);
+  }
+
   .node-icon-left {
+    color: var(--rs-text-primary);
     position: absolute;
     text-align: center;
     vertical-align: middle;
@@ -28,6 +44,7 @@
   }
 
   .node-icon-right {
+    color: var(--rs-text-primary);
     position: absolute;
     text-align: center;
     vertical-align: middle;
