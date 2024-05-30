@@ -10,7 +10,7 @@ import {
   isLoadingFlowEditor,
 } from "../../store/flowEditor.store";
 import getFlows from "../../service/flows/getFlows.services";
-import flowEditorHandlers from "../../hooks/flowEditorHandlers.hook";
+// import flowEditorHandlers from "../../hooks/flowEditorHandlers.hook";
 import fetchFlowSetting from "../../service/flows/fetchFlowSetting.service";
 import { ApiResponse } from "@ecoflow/types";
 import { LoadingSquareCircle } from "@ecoflow/components-lib";
@@ -18,7 +18,7 @@ import "./style.less";
 import DebugConsole from "./DebugConsole/DebugConsole.component";
 
 export default function FlowEditor() {
-  const hnl = flowEditorHandlers();
+  // const hnl = flowEditorHandlers();
   const [isLoading, setLoading] = useAtom(isLoadingFlowEditor);
   const [flow, setFlow] = useState("");
   const debugConsoleDrawerValue = useAtomValue(debugConsoleDrawer);
@@ -60,7 +60,7 @@ export default function FlowEditor() {
     );
   }, []);
 
-  useEffect(() => console.log(hnl.flowEditorValue), [hnl.flowEditorValue]);
+  // useEffect(() => console.log(hnl.flowEditorValue), [hnl.flowEditorValue]);
 
   return (
     <>
