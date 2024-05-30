@@ -57,9 +57,15 @@ export default function NodeAppearanceTab({
               onClean={() => updatedNodesAppearance({ icon: null })}
               onSelect={(value) => updatedNodesAppearance({ icon: value })}
               renderValue={(value) => <IconWrapper icon={iconFetcher[value]} />}
-              renderMenuItem={(label) => (
-                <IconWrapper icon={iconFetcher[label as string]} />
-              )}
+              renderMenuItem={(label) =>
+                typeof label === "string" ? (
+                  <IconWrapper icon={iconFetcher[label]} />
+                ) : (
+                  <IconWrapper
+                    icon={iconFetcher[(label as any).props.children]}
+                  />
+                )
+              }
               value={
                 nodeAppearanceConfigurations.icon
                   ? nodeAppearanceConfigurations.icon
