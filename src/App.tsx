@@ -7,6 +7,7 @@ import { CustomProvider, Loader } from "rsuite";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorFallback from "./components/ErrorFallback/ErrorFallback.componennt";
 import Routes from "./routes/Routes";
+import { BrowserRouter } from "react-router-dom";
 
 function App() {
   const [darkMode] = useAtom(themeMode);
@@ -28,7 +29,9 @@ function App() {
             <Loader backdrop content="loading..." />
           ) : (
             <ErrorBoundary FallbackComponent={ErrorFallback}>
-              <Routes />
+              <BrowserRouter>
+                <Routes />
+              </BrowserRouter>
             </ErrorBoundary>
           )}
         </CustomProvider>
