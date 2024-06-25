@@ -235,7 +235,7 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
   const onDrop = useCallback(
     (event: DragEvent<HTMLDivElement>) => {
       event.preventDefault();
-      const { moduleID, type, label, configured } = JSON.parse(
+      const { moduleID, type, label, configured, nodeDescription } = JSON.parse(
         event.dataTransfer.getData("application/ecoflow/nodes")
       );
 
@@ -246,7 +246,7 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
         y: event.clientY,
       });
       const nodeID = generateNodeID();
-      const newNode: Node<FlowsNodeDataTypes> = {
+      const newNode: Node<FlowsNodeDataTypes & { nodeDescription?: string }> = {
         id: nodeID,
         type,
         position,
@@ -257,6 +257,7 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
           disabled: false,
           description: "",
           appearance: defaultNodeAppearance,
+          nodeDescription: nodeDescription,
           openDrawer: (
             label: string,
             configured: boolean,
