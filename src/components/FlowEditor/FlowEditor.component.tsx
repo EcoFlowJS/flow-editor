@@ -18,7 +18,6 @@ import "./style.less";
 import DebugConsole from "./DebugConsole/DebugConsole.component";
 
 export default function FlowEditor() {
-  // const hnl = flowEditorHandlers();
   const [isLoading, setLoading] = useAtom(isLoadingFlowEditor);
   const [flow, setFlow] = useState("");
   const debugConsoleDrawerValue = useAtomValue(debugConsoleDrawer);
@@ -59,8 +58,6 @@ export default function FlowEditor() {
       }
     );
   }, []);
-
-  // useEffect(() => console.log(hnl.flowEditorValue), [hnl.flowEditorValue]);
 
   return (
     <>

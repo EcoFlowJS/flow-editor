@@ -77,10 +77,12 @@ export default function NodeLists() {
                 >
                   {module.nodes.map((node, key) => (
                     <Nodes
+                      id={node.id._id}
                       key={key}
                       moduleID={node.id}
                       type={node.type}
                       label={node.name}
+                      description={node.describtion}
                       isInputsAvailable={node.inputs ? node.inputs.length : 0}
                     />
                   ))}
