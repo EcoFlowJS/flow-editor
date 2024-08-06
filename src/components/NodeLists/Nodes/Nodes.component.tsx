@@ -11,7 +11,7 @@ import "./style.less";
 import { FlexboxGrid, Popover, Whisper } from "rsuite";
 import { IconWrapper } from "@ecoflow/components-lib";
 import { EcoModuleID, ModuleTypes } from "@ecoflow/types";
-import { TbRouteSquare2 } from "react-icons/tb";
+import { TbRouteSquare2, TbTimelineEventPlus, TbTimelineEventText } from "react-icons/tb";
 import { GiServerRack } from "react-icons/gi";
 import { CgDebug } from "react-icons/cg";
 import { LuSquareStack } from "react-icons/lu";
@@ -90,6 +90,10 @@ export default function Nodes({
                   ? "node-middleware"
                   : type === "Response"
                   ? "node-response"
+                  : type === "EventListener"
+                  ? "node-event-listener"
+                  : type === "EventEmitter"
+                  ? "node-event-emitter"
                   : "node-unknown"
               }`}
               draggable={draggable ? draggable : true}
@@ -97,13 +101,16 @@ export default function Nodes({
             >
               {type === "Middleware" ||
               type === "Debug" ||
-              type === "Response" ? (
+              type === "Response" ||
+              type === "EventEmitter" ? (
                 <span className="node-connection-left" />
               ) : (
                 <></>
               )}
 
-              {type === "Middleware" || type === "Request" ? (
+              {type === "Middleware" ||
+              type === "Request" ||
+              type === "EventListener" ? (
                 <div className="node-icon-left">
                   <FlexboxGrid
                     justify="center"
@@ -116,6 +123,8 @@ export default function Nodes({
                           ? icon
                           : type === "Request"
                           ? TbRouteSquare2
+                          : type === "EventListener"
+                          ? TbTimelineEventText
                           : GiServerRack
                       }
                     />
@@ -128,7 +137,9 @@ export default function Nodes({
               <div
                 className="node-label"
                 style={
-                  type === "Debug" || type === "Response"
+                  type === "Debug" ||
+                  type === "Response" ||
+                  type === "EventEmitter"
                     ? { padding: "5px 35px 5px 10px" }
                     : {}
                 }
@@ -136,7 +147,9 @@ export default function Nodes({
                 {label}
               </div>
 
-              {type === "Debug" || type === "Response" ? (
+              {type === "Debug" ||
+              type === "Response" ||
+              type === "EventEmitter" ? (
                 <div className="node-icon-right">
                   <FlexboxGrid
                     justify="center"
@@ -145,7 +158,13 @@ export default function Nodes({
                   >
                     <IconWrapper
                       icon={
-                        icon ? icon : type === "Debug" ? CgDebug : LuSquareStack
+                        icon
+                          ? icon
+                          : type === "Debug"
+                          ? CgDebug
+                          : type === "EventEmitter"
+                          ? TbTimelineEventPlus
+                          : LuSquareStack
                       }
                     />
                   </FlexboxGrid>
@@ -154,7 +173,9 @@ export default function Nodes({
                 <></>
               )}
 
-              {type === "Middleware" || type === "Request" ? (
+              {type === "Middleware" ||
+              type === "Request" ||
+              type === "EventListener" ? (
                 <span className="node-connection-right" />
               ) : (
                 <></>

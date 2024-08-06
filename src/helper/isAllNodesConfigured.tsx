@@ -1,5 +1,5 @@
 import {
-  Describtions,
+  Descriptions,
   FlowDefinitions,
   FlowsDescription,
   Nodes,
@@ -12,7 +12,7 @@ const isAllNodesConfigured = (
   const nodes: Nodes = [];
   Object.keys(definitions).map((key) => {
     if (has(definitions[key], "definitions"))
-      nodes.push(...(definitions[key] as Describtions).definitions);
+      nodes.push(...(definitions[key] as Descriptions).definitions);
     else nodes.push(...(definitions[key] as Nodes));
   });
 

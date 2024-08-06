@@ -31,7 +31,7 @@ export default function NodeAppearanceTab({
 
   useEffect(
     () => onChange(nodeAppearanceConfigurations),
-    [nodeAppearanceConfigurations]
+    [nodeAppearanceConfigurations, onChange]
   );
 
   return (
@@ -77,6 +77,10 @@ export default function NodeAppearanceTab({
                   ? "LuSquareStack"
                   : type === "Debug"
                   ? "CgDebug"
+                  : type === "EventListener"
+                  ? "TbTimelineEventText"
+                  : type === "EventEmitter"
+                  ? "TbTimelineEventPlus"
                   : null
               }
             />
