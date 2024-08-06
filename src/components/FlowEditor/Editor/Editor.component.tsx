@@ -87,10 +87,23 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
     (connections: Edge | Connection) => {
       if (connections.source === connections.target) return false;
 
+      /**
+       * Filters the edges array to find the target node IDs that match the given source node.
+       * @param {Array} edges - The array of edges to filter.
+       * @param {string} connections.source - The source node to match.
+       * @returns An array of target node IDs that match the given source node.
+       */
       const targetNodeIDs = edges
         .filter((edge) => edge.source === connections.source)
         .map((e) => e.target);
 
+      /**
+       * Checks if there are nodes with specific IDs and types in the given array of nodes.
+       * @param {Array} nodes - The array of nodes to filter through.
+       * @param {Array} targetNodeIDs - The array of target node IDs to check for.
+       * @param {string} connections.target - The target connection ID to check against.
+       * @returns {boolean} Returns false if the conditions are met, otherwise true.
+       */
       if (
         nodes.filter(
           (node) => targetNodeIDs.includes(node.id) && node.type === "Response"
@@ -101,6 +114,11 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
       )
         return false;
 
+      /**
+       * Updates the edges in the graph based on the existing connections and nodes.
+       * @param {function} existingConnections - The existing connections in the graph.
+       * @returns None
+       */
       setEdges((existingConnections) => {
         const sourceNode = nodes.filter(
           (node) => node.id === connections.source
@@ -118,6 +136,15 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
           existingConnections
         );
 
+        /**
+         * Finds the target node based on the connection target ID and filters the updated edges
+         * to get the target IDs based on the source connection.
+         * @param {Array} nodes - The array of nodes to search for the target node.
+         * @param {string} connections.target - The ID of the target connection.
+         * @param {Array} updatedEdge - The array of updated edges to filter.
+         * @param {string} connections.source - The ID of the source connection.
+         * @returns {Array} An array of target nodes and an array of target IDs.
+         */
         const targetNodes = nodes.find(
           (node) => node.id === connections.target
         );
@@ -125,12 +152,28 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
           .filter((e) => e.source === connections.source)
           .map((e) => e.target);
 
+        /**
+         * Checks if the targetNodes type is "Response" or if any of the nodes with targetIds
+         * includes the id and has a type of "Response".
+         * @param {object} targetNodes - The target nodes object to check.
+         * @param {array} nodes - The array of nodes to filter through.
+         * @param {array} targetIds - The array of target ids to check against.
+         * @returns {boolean} True if the condition is met, false otherwise.
+         */
         if (
           (targetNodes && targetNodes.type === "Response") ||
           nodes.filter(
             (node) => targetIds.includes(node.id) && node.type === "Response"
           ).length > 0
         )
+          /**
+           * Filters the edges in the updatedEdge array based on the source property matching the connections.source value.
+           * For each matching edge, if the corresponding node is of type "Middleware", updates the edge with new properties.
+           * @param {Array} updatedEdge - The array of edges to filter and update.
+           * @param {Object} connections - The connections object containing the source property to match.
+           * @param {Array} nodes - The array of nodes to search for the target node.
+           * @returns None
+           */
           updatedEdge
             .filter((edge) => edge.source === connections.source)
             .forEach((edge) => {
@@ -148,6 +191,11 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
                 );
             });
 
+        /**
+         * Filters out duplicate edges from the given array of edges based on their 'id' property.
+         * @param {Array} updatedEdge - The array of edges to filter.
+         * @returns {Array} An array of unique edges with no duplicates based on their 'id' property.
+         */
         return updatedEdge.filter(
           (edge, index, edges) =>
             edges.indexOf(edges.filter((e) => e.id === edge.id)[0]) === index
@@ -216,7 +264,18 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
 
   const onNodesDelete = useCallback(
     (nodeLists: Node[]) => {
+      /**
+       * Extracts the IDs of nodes from an array of node lists.
+       * @param {Array} nodeLists - An array of node lists.
+       * @returns {Array} An array of IDs of the nodes extracted from the node lists.
+       */
       const deletedNodeIDs = nodeLists.map((node) => node.id);
+
+      /**
+       * Updates the node configurations by filtering out the configurations of deleted nodes.
+       * @param {NodeConfiguration[]} nodeConfigurations - The array of node configurations to update.
+       * @returns None
+       */
       setNodeConfigurations((nodeConfigurations) =>
         nodeConfigurations.filter(
           (nodeConfiguration) =>
@@ -235,17 +294,52 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
   const onDrop = useCallback(
     (event: DragEvent<HTMLDivElement>) => {
       event.preventDefault();
+
+      /**
+       * Parses the JSON data from the event data transfer and extracts the moduleID, type, label,
+       * configured, and nodeDescription properties.
+       * @param {string} event.dataTransfer.getData("application/ecoflow/nodes") - The JSON data to parse.
+       * @returns An object containing moduleID, type, label, configured, and nodeDescription properties.
+       */
       const { moduleID, type, label, configured, nodeDescription } = JSON.parse(
         event.dataTransfer.getData("application/ecoflow/nodes")
       );
 
+      /**
+       * Checks if the type is undefined or falsy, and returns early if it is.
+       * @param {any} type - The type to check for undefined or falsy value.
+       * @returns None
+       */
       if (typeof type === "undefined" || !type) return;
 
+      /**
+       * Converts screen coordinates to flow coordinates using the reactFlowInstance.
+       * @param {object} event - The event object containing clientX and clientY properties.
+       * @returns The position object with x and y coordinates in flow space.
+       */
       const position = reactFlowInstance.screenToFlowPosition({
         x: event.clientX,
         y: event.clientY,
       });
+
+      /**
+       * Generates a unique node ID.
+       * @returns {string} A unique node ID.
+       */
       const nodeID = generateNodeID();
+
+      /**
+       * Creates a new node with the specified properties.
+       * @param {string} nodeID - The ID of the node.
+       * @param {string} type - The type of the node.
+       * @param {Position} position - The position of the node.
+       * @param {string} moduleID - The ID of the module.
+       * @param {string} label - The label of the node.
+       * @param {boolean} configured - Indicates if the node is configured.
+       * @param {string} nodeDescription - The description of the node.
+       * @param {NodeAppearanceConfigurations} defaultNodeAppearance - The default appearance of the node.
+       * @returns A new node with the specified properties.
+       */
       const newNode: Node<FlowsNodeDataTypes & { nodeDescription?: string }> = {
         id: nodeID,
         type,
@@ -277,7 +371,20 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
         },
       };
 
+      /**
+       * Concatenates a new node to the existing list of nodes using the setNodes function.
+       * @param {Array} nds - The current list of nodes.
+       * @param {any} newNode - The new node to be added to the list.
+       * @returns None
+       */
       setNodes((nds) => nds.concat(newNode));
+
+      /**
+       * Updates the node configurations by adding a new configuration object for a specific node ID.
+       * @param {Function} setNodeConfigurations - The function to update the node configurations.
+       * @param {string} nodeID - The ID of the node to add configuration for.
+       * @returns None
+       */
       setNodeConfigurations((configurations) =>
         configurations.concat([{ nodeID, configs: {} }])
       );
