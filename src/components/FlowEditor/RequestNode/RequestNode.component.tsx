@@ -7,6 +7,9 @@ import { FlowsNodeDataTypes } from "@ecoflow/types";
 import isUndefined from "lodash/isUndefined";
 import isEmpty from "lodash/isEmpty";
 import iconFetcher from "../../../helper/iconFetcher";
+import { useAtomValue } from "jotai";
+import darkModeAtom from "../../../store/theme.mode";
+import colorGenerator from "../../../helper/colorGenerator";
 
 const RequestNode = memo(
   ({
@@ -15,8 +18,10 @@ const RequestNode = memo(
     isConnectable,
     selected,
   }: NodeProps<FlowsNodeDataTypes & { nodeDescription?: string }>) => {
+    const isDarkMode = useAtomValue(darkModeAtom);
     const {
       label,
+      color,
       icon,
       configured,
       disabled,
@@ -60,17 +65,31 @@ const RequestNode = memo(
                     } ${disabled ? "flow-node-disabled" : ""} ${
                       isError ? "node-error" : ""
                     }`}
-                    style={
-                      !isUndefined(appearance.label) && !appearance.label
+                    style={{
+                      ...(!isUndefined(appearance.label) && !appearance.label
                         ? { width: 30, minHeight: 30 }
-                        : { width: 130, minHeight: 30 }
-                    }
+                        : { width: 130, minHeight: 30 }),
+                      ...(color
+                        ? {
+                            backgroundColor: isDarkMode
+                              ? color
+                              : colorGenerator(color, 5)[3],
+                          }
+                        : {}),
+                    }}
                   >
                     <div
                       className="node-icon-left"
                       style={{
                         ...(!isUndefined(appearance.label) && !appearance.label
-                          ? { borderRight: "none", borderRadius: 4 }
+                          ? { borderLeft: "none", borderRadius: 4 }
+                          : {}),
+                        ...(color
+                          ? {
+                              backgroundColor: isDarkMode
+                                ? color
+                                : colorGenerator(color, 5)[3],
+                            }
                           : {}),
                       }}
                     >
@@ -151,17 +170,31 @@ const RequestNode = memo(
                     } ${disabled ? "flow-node-disabled" : ""} ${
                       isError ? "node-error" : ""
                     }`}
-                    style={
-                      !isUndefined(appearance.label) && !appearance.label
+                    style={{
+                      ...(!isUndefined(appearance.label) && !appearance.label
                         ? { width: 30, minHeight: 30 }
-                        : { width: 130, minHeight: 30 }
-                    }
+                        : { width: 130, minHeight: 30 }),
+                      ...(color
+                        ? {
+                            backgroundColor: isDarkMode
+                              ? color
+                              : colorGenerator(color, 5)[3],
+                          }
+                        : {}),
+                    }}
                   >
                     <div
                       className="node-icon-left"
                       style={{
                         ...(!isUndefined(appearance.label) && !appearance.label
-                          ? { borderRight: "none", borderRadius: 4 }
+                          ? { borderLeft: "none", borderRadius: 4 }
+                          : {}),
+                        ...(color
+                          ? {
+                              backgroundColor: isDarkMode
+                                ? color
+                                : colorGenerator(color, 5)[3],
+                            }
                           : {}),
                       }}
                     >

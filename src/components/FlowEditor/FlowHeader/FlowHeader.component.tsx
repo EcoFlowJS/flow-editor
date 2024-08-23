@@ -1,18 +1,31 @@
-import { FlexboxGrid, Form, IconButton, Tooltip, Whisper } from "rsuite";
+import {
+  FlexboxGrid,
+  Form,
+  Highlight,
+  IconButton,
+  Text,
+  Tooltip,
+  Whisper,
+} from "rsuite";
 import ResponsiveNav from "@rsuite/responsive-nav";
 import { KeyboardEvent, useEffect, useState } from "react";
 import { AlertModal, IconWrapper, FormGroup } from "@ecoflow/components-lib";
 import { BiSolidLayerPlus } from "react-icons/bi";
 import "./style.less";
 import flowEditorHandlers from "../../../hooks/flowEditorHandlers.hook";
-import { isEmpty, isUndefined } from "lodash";
+import { isEmpty, isString, isUndefined } from "lodash";
 import { useSetAtom } from "jotai";
-import { errorNotification } from "../../../store/notification.store";
+import {
+  errorNotification,
+  successNotification,
+} from "../../../store/notification.store";
 import FlowEditorSettingsDropdownMenu from "./FlowEditorSettingsDropdownMenu/FlowEditorSettingsDropdownMenu.component";
 import { FaGears } from "react-icons/fa6";
 import { currentFlow } from "../../../store/flowEditor.store";
 import { GrConfigure } from "react-icons/gr";
 import { PiTreeStructureBold } from "react-icons/pi";
+import deployFlowConfigurations from "../../../service/flows/deployFlowConfigurations.service";
+import { ApiResponse } from "@ecoflow/types";
 
 interface FlowHeaderProps {
   onFlowSelect?: (flowName: string) => void;
@@ -34,13 +47,15 @@ export default function FlowHeader({
     editID?: string;
   }>({ show: false });
 
+  const [deployConfigAlert, setDeployConfigAlert] = useState(false);
+
   //Notifications
   const errorNoti = useSetAtom(errorNotification);
+  const setSuccessNotification = useSetAtom(successNotification);
 
   const onSelectHandler = (eventKey?: string) => {
     if (eventKey && eventKey !== "configs" && activeKey === "configs")
-      console.log("popup");
-    //TODO: add popup notification
+      setDeployConfigAlert(true);
 
     setActiveKey((key) => (typeof eventKey !== "undefined" ? eventKey : key));
   };
@@ -93,6 +108,52 @@ export default function FlowHeader({
     }
   };
 
+  const deployConfigFlow = () => {
+    deployFlowConfigurations(
+      {
+        configs: flowHandlers.flowEditorValue["configs"],
+      },
+      true
+    ).then(
+      (response: ApiResponse) => {
+        if (response.success) {
+          setDeployConfigAlert(false);
+          setSuccessNotification({
+            show: true,
+            placement: "bottomStart",
+            header: "Deployment Success",
+            message: "Configurations successfully deployed.",
+          });
+
+          flowHandlers.flowEditorValue["configs"].definitions.forEach(
+            ({ id }) =>
+              flowHandlers.updateNodeDefinitionData(id, { isError: false })
+          );
+        }
+      },
+      (reject: ApiResponse) => {
+        if (reject.error) {
+          errorNoti({
+            show: true,
+            placement: "bottomStart",
+            header: "Deploying flow Error",
+            message: isString(reject.payload)
+              ? reject.payload
+              : reject.payload.msg,
+          });
+
+          if (reject.payload.nodesID)
+            reject.payload.nodesID.forEach((nodeID: string) =>
+              flowHandlers.updateNodeDefinitionData(nodeID, { isError: true })
+            );
+
+          setDeployConfigAlert(false);
+          setActiveKey("configs");
+        }
+      }
+    );
+  };
+
   useEffect(() => {
     if (
       !isUndefined(disabled) &&
@@ -100,6 +161,7 @@ export default function FlowHeader({
       Object.keys(flowHandlers.flowEditorValue).length === 0
     ) {
       setActiveKey("Flow1");
+      flowHandlers.addFlow("configs");
       flowHandlers.addFlow("Flow1");
     }
   }, [disabled]);
@@ -114,22 +176,19 @@ export default function FlowHeader({
   }, [addRenameOpen.show]);
 
   useEffect(() => {
-    if (flows.length === 1 && flows[0] === "Flow1") {
+    if (flows.length === 2 && flows[0] === "configs" && flows[1] === "Flow1") {
+      const flows = Object.keys(flowHandlers.flowEditorValue);
+      flows.splice(flows.indexOf("configs"), 1);
+
       setFlows(
-        Object.keys(flowHandlers.flowEditorValue).length > 0
-          ? Object.keys(flowHandlers.flowEditorValue)
-          : ["Flow1"]
+        Object.keys(flowHandlers.flowEditorValue).length > 1
+          ? ["configs", ...flows]
+          : ["configs", "Flow1"]
       );
 
-      setActiveKey((activeKey) =>
-        activeKey ? activeKey : Object.keys(flowHandlers.flowEditorValue)[0]
-      );
+      setActiveKey((activeKey) => (activeKey ? activeKey : flows[0]));
     }
   }, [flowHandlers.flowEditorValue]);
-
-  useEffect(() => {
-    if (activeKey === "") setActiveKey(flows[1]);
-  }, []);
 
   return (
     <>
@@ -254,6 +313,39 @@ export default function FlowHeader({
               }}
             />
           </Form>
+        </AlertModal.Body>
+      </AlertModal>
+
+      <AlertModal
+        open={deployConfigAlert}
+        onClose={() => setDeployConfigAlert(false)}
+        size="md"
+        CancelButtonProps={{
+          color: "red",
+          onClick: () => setDeployConfigAlert(false),
+        }}
+        confirmButtonProps={{
+          color: "green",
+          onClick: deployConfigFlow,
+        }}
+      >
+        <AlertModal.Header>
+          Do you want deploy the configuration to keep it up to date?
+        </AlertModal.Header>
+        <AlertModal.Body>
+          <Highlight query="configs">
+            <Text size="lg">
+              Any changes made here will not affect the flow until and unless
+              the configs flow is deployed. Please update your configuration.
+            </Text>
+          </Highlight>
+          <br />
+          <br />
+          <br />
+          <Text muted>
+            Note: On Full deploy config flow get deployed automatic. If you want
+            all flows at once you may ignore this message.
+          </Text>
         </AlertModal.Body>
       </AlertModal>
     </>

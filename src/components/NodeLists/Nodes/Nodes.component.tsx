@@ -20,6 +20,9 @@ import { GiServerRack } from "react-icons/gi";
 import { CgDebug } from "react-icons/cg";
 import { LuSquareStack } from "react-icons/lu";
 import { GrConfigure } from "react-icons/gr";
+import colorGenerator from "../../../helper/colorGenerator";
+import { useAtomValue } from "jotai";
+import darkModeAtom from "../../../store/theme.mode";
 
 interface NodesProps
   extends DetailedHTMLProps<
@@ -49,6 +52,8 @@ export default function Nodes({
   onDragStart,
   ...props
 }: NodesProps & { description?: string }) {
+  const isDarkMode = useAtomValue(darkModeAtom);
+
   const onDragStartNodeHandler = (event: DragEvent<HTMLDivElement>) => {
     event.dataTransfer.setData(
       "application/ecoflow/nodes",
@@ -105,7 +110,15 @@ export default function Nodes({
                   ? "node-configuration"
                   : "node-unknown"
               }`}
-              style={color ? { backgroundColor: color } : {}}
+              style={
+                color
+                  ? {
+                      backgroundColor: isDarkMode
+                        ? color
+                        : colorGenerator(color, 5)[3],
+                    }
+                  : {}
+              }
               draggable={draggable ? draggable : true}
               onDragStart={onDragStart ? onDragStart : onDragStartNodeHandler}
             >

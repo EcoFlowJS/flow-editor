@@ -6,12 +6,16 @@ import { NodeProps } from "reactflow";
 import { Badge, FlexboxGrid, Popover, Whisper } from "rsuite";
 import iconFetcher from "../../../helper/iconFetcher";
 import { GrConfigure } from "react-icons/gr";
+import { useAtomValue } from "jotai";
+import darkModeAtom from "../../../store/theme.mode";
+import colorGenerator from "../../../helper/colorGenerator";
 
 const ConfigurationNode = memo(
   ({
     data,
     selected,
   }: NodeProps<FlowsNodeDataTypes & { nodeDescription?: string }>) => {
+    const isDarkMode = useAtomValue(darkModeAtom);
     const {
       label,
       color,
@@ -21,6 +25,7 @@ const ConfigurationNode = memo(
       description,
       nodeDescription,
       appearance,
+      isError,
       openDrawer,
     } = data;
 
@@ -55,12 +60,20 @@ const ConfigurationNode = memo(
                   <div
                     className={`node node-configuration ${
                       selected ? "selected" : ""
-                    } ${disabled ? "flow-node-disabled" : ""}`}
+                    } ${disabled ? "flow-node-disabled" : ""} ${
+                      isError ? "node-error" : ""
+                    }`}
                     style={{
                       ...(!isUndefined(appearance.label) && !appearance.label
                         ? { width: 30, minHeight: 30 }
                         : { width: 130, minHeight: 30 }),
-                      ...(color ? { backgroundColor: color } : {}),
+                      ...(color
+                        ? {
+                            backgroundColor: isDarkMode
+                              ? color
+                              : colorGenerator(color, 5)[3],
+                          }
+                        : {}),
                     }}
                   >
                     <div
@@ -120,12 +133,20 @@ const ConfigurationNode = memo(
                   <div
                     className={`node node-configuration ${
                       selected ? "selected" : ""
-                    } ${disabled ? "flow-node-disabled" : ""}`}
+                    } ${disabled ? "flow-node-disabled" : ""} ${
+                      isError ? "node-error" : ""
+                    }`}
                     style={{
                       ...(!isUndefined(appearance.label) && !appearance.label
                         ? { width: 30, minHeight: 30 }
                         : { width: 130, minHeight: 30 }),
-                      ...(color ? { backgroundColor: color } : {}),
+                      ...(color
+                        ? {
+                            backgroundColor: isDarkMode
+                              ? color
+                              : colorGenerator(color, 5)[3],
+                          }
+                        : {}),
                     }}
                   >
                     <div

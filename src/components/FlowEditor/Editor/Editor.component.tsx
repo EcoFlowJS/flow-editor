@@ -465,7 +465,7 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
   useEffect(() => {
     if (isEmpty(activeFlow) && isEmpty(lastFlow)) return;
     setNodes(
-      (flowHandlers.flowEditorValue[activeFlow]?.definitions || []).map(
+      (flowHandlers.flowEditorValue[activeFlow]?.definitions).map(
         (definition) => {
           if (isUndefined(definition.data.openDrawer))
             definition.data.openDrawer = (
@@ -489,9 +489,9 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
         }
       )
     );
-    setEdges(flowHandlers.flowEditorValue[activeFlow]?.connections || []);
+    setEdges(flowHandlers.flowEditorValue[activeFlow]?.connections);
     setNodeConfigurations(
-      flowHandlers.flowEditorValue[activeFlow]?.configurations || []
+      flowHandlers.flowEditorValue[activeFlow]?.configurations
     );
 
     flowHandlers.updateFlowEditor(lastFlow, {

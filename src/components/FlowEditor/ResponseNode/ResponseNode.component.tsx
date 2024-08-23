@@ -15,6 +15,9 @@ import { FlowsNodeDataTypes } from "@ecoflow/types";
 import isUndefined from "lodash/isUndefined";
 import isEmpty from "lodash/isEmpty";
 import iconFetcher from "../../../helper/iconFetcher";
+import { useAtomValue } from "jotai";
+import darkModeAtom from "../../../store/theme.mode";
+import colorGenerator from "../../../helper/colorGenerator";
 
 const selector = (s: ReactFlowState) => ({
   nodeInternals: s.nodeInternals,
@@ -27,8 +30,10 @@ const ResponseNode = memo(
     data,
     selected,
   }: NodeProps<FlowsNodeDataTypes & { nodeDescription?: string }>) => {
+    const isDarkMode = useAtomValue(darkModeAtom);
     const {
       label,
+      color,
       icon,
       configured,
       isConnectable,
@@ -83,11 +88,18 @@ const ResponseNode = memo(
                     className={`node node-response ${
                       selected ? "selected" : ""
                     } ${disabled ? "flow-node-disabled" : ""}`}
-                    style={
-                      !isUndefined(appearance.label) && !appearance.label
+                    style={{
+                      ...(!isUndefined(appearance.label) && !appearance.label
                         ? { width: 30, minHeight: 30 }
-                        : { width: 130, minHeight: 30 }
-                    }
+                        : { width: 130, minHeight: 30 }),
+                      ...(color
+                        ? {
+                            backgroundColor: isDarkMode
+                              ? color
+                              : colorGenerator(color, 5)[3],
+                          }
+                        : {}),
+                    }}
                   >
                     {!isUndefined(appearance.label) && appearance.label ? (
                       <div
@@ -104,6 +116,13 @@ const ResponseNode = memo(
                       style={{
                         ...(!isUndefined(appearance.label) && !appearance.label
                           ? { borderLeft: "none", borderRadius: 4 }
+                          : {}),
+                        ...(color
+                          ? {
+                              backgroundColor: isDarkMode
+                                ? color
+                                : colorGenerator(color, 5)[3],
+                            }
                           : {}),
                       }}
                     >
@@ -177,11 +196,18 @@ const ResponseNode = memo(
                     className={`node node-response ${
                       selected ? "selected" : ""
                     } ${disabled ? "flow-node-disabled" : ""}`}
-                    style={
-                      !isUndefined(appearance.label) && !appearance.label
+                    style={{
+                      ...(!isUndefined(appearance.label) && !appearance.label
                         ? { width: 30, minHeight: 30 }
-                        : { width: 130, minHeight: 30 }
-                    }
+                        : { width: 130, minHeight: 30 }),
+                      ...(color
+                        ? {
+                            backgroundColor: isDarkMode
+                              ? color
+                              : colorGenerator(color, 5)[3],
+                          }
+                        : {}),
+                    }}
                   >
                     {!isUndefined(appearance.label) && appearance.label ? (
                       <div
@@ -198,6 +224,13 @@ const ResponseNode = memo(
                       style={{
                         ...(!isUndefined(appearance.label) && !appearance.label
                           ? { borderLeft: "none", borderRadius: 4 }
+                          : {}),
+                        ...(color
+                          ? {
+                              backgroundColor: isDarkMode
+                                ? color
+                                : colorGenerator(color, 5)[3],
+                            }
                           : {}),
                       }}
                     >
