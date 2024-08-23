@@ -11,6 +11,8 @@ import { errorNotification } from "../../../store/notification.store";
 import FlowEditorSettingsDropdownMenu from "./FlowEditorSettingsDropdownMenu/FlowEditorSettingsDropdownMenu.component";
 import { FaGears } from "react-icons/fa6";
 import { currentFlow } from "../../../store/flowEditor.store";
+import { GrConfigure } from "react-icons/gr";
+import { PiTreeStructureBold } from "react-icons/pi";
 
 interface FlowHeaderProps {
   onFlowSelect?: (flowName: string) => void;
@@ -24,8 +26,8 @@ export default function FlowHeader({
   const flowHandlers = flowEditorHandlers();
   const [activeKey, setActiveKey] = useState<string>("");
   const setCurrentFlow = useSetAtom(currentFlow);
+  const [flows, setFlows] = useState(["configs", "Flow1"]);
   const [nameFormValue, setNameFormValue] = useState({ flowName: "" });
-  const [flows, setFlows] = useState(["Flow1"]);
   const [addRenameOpen, setAddRenameOpen] = useState<{
     show: boolean;
     mode?: "ADD" | "EDIT";
@@ -35,14 +37,20 @@ export default function FlowHeader({
   //Notifications
   const errorNoti = useSetAtom(errorNotification);
 
-  const onSelectHandler = (eventKey?: string) =>
+  const onSelectHandler = (eventKey?: string) => {
+    if (eventKey && eventKey !== "configs" && activeKey === "configs")
+      console.log("popup");
+    //TODO: add popup notification
+
     setActiveKey((key) => (typeof eventKey !== "undefined" ? eventKey : key));
+  };
 
   const removeFlowHandler = (eventKey: string) => {
+    if (eventKey === "configs") return;
     const nextFlows = [...flows];
     const removedFlow = nextFlows.splice(nextFlows.indexOf(eventKey), 1);
     setFlows(nextFlows);
-    setActiveKey(nextFlows[0] ? nextFlows[0] : "");
+    setActiveKey(nextFlows[1] ? nextFlows[1] : "");
     flowHandlers.dropFlow(removedFlow[0]);
   };
 
@@ -119,6 +127,10 @@ export default function FlowHeader({
     }
   }, [flowHandlers.flowEditorValue]);
 
+  useEffect(() => {
+    if (activeKey === "") setActiveKey(flows[1]);
+  }, []);
+
   return (
     <>
       <FlexboxGrid
@@ -142,14 +154,24 @@ export default function FlowHeader({
               <ResponsiveNav.Item
                 as="div"
                 key={flow}
+                icon={
+                  flow === "configs" ? (
+                    <IconWrapper icon={GrConfigure} />
+                  ) : (
+                    <IconWrapper icon={PiTreeStructureBold} />
+                  )
+                }
                 disabled={disabled}
                 eventKey={flow}
-                onDoubleClick={() =>
-                  setAddRenameOpen({
-                    show: true,
-                    mode: "EDIT",
-                    editID: flow,
-                  })
+                onDoubleClick={
+                  flow !== "configs"
+                    ? () =>
+                        setAddRenameOpen({
+                          show: true,
+                          mode: "EDIT",
+                          editID: flow,
+                        })
+                    : () => {}
                 }
               >
                 {flow}

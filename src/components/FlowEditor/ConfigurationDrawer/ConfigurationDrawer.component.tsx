@@ -2,7 +2,7 @@ import has from "lodash/has";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import isUndefined from "lodash/isUndefined";
-import { Drawer, Panel, Placeholder } from "rsuite";
+import { Drawer, Heading, Panel, Placeholder, Stack, Text } from "rsuite";
 import DrawerHeader from "./DrawerHeader/DrawerHeader.component";
 import fetchNodes from "../../../service/nodes/fetchNodes.service";
 import NodeNameInput from "./NodeNameInput/NodeNameInput.component";
@@ -227,12 +227,28 @@ export default function ConfigurationDrawer({
           {isLoading ? (
             <Placeholder.Paragraph rows={10} rowHeight={10} />
           ) : (
-            <NodeConfigurationTabs
-              moduleNode={moduleNode}
-              nodeConfigurations={nodeConfigurations}
-              disabled={isLoading}
-              onChange={updateNodeConfiguration}
-            />
+            <>
+              <Stack
+                alignItems="center"
+                style={{ paddingBottom: 20 }}
+                spacing={12}
+              >
+                <Stack.Item>
+                  <Heading level={5}>Config Reference ID : </Heading>
+                </Stack.Item>
+                <Stack.Item>
+                  <Text muted style={{ userSelect: "text" }}>
+                    {flowConfigurationDrawer.nodeID}
+                  </Text>
+                </Stack.Item>
+              </Stack>
+              <NodeConfigurationTabs
+                moduleNode={moduleNode}
+                nodeConfigurations={nodeConfigurations}
+                disabled={isLoading}
+                onChange={updateNodeConfiguration}
+              />
+            </>
           )}
         </Panel>
       </Drawer.Body>

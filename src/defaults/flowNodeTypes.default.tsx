@@ -1,3 +1,4 @@
+import ConfigurationNode from "../components/FlowEditor/ConfigurationNode/ConfigurationNode.component";
 import DebugNode from "../components/FlowEditor/DebugNode/DebugNode.component";
 import EventEmitterNode from "../components/FlowEditor/EventEmitterNode/EventEmitterNode.component";
 import EventListenerNode from "../components/FlowEditor/EventListenerNode/EventListenerNode.component";
@@ -12,6 +13,7 @@ const flowNodeTypes = {
   Debug: DebugNode,
   EventListener: EventListenerNode,
   EventEmitter: EventEmitterNode,
+  Configuration: ConfigurationNode,
 };
 
 export default flowNodeTypes;
