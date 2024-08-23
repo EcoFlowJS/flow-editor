@@ -31,7 +31,7 @@ export default function NodeAppearanceTab({
 
   useEffect(
     () => onChange(nodeAppearanceConfigurations),
-    [nodeAppearanceConfigurations, onChange]
+    [nodeAppearanceConfigurations]
   );
 
   return (

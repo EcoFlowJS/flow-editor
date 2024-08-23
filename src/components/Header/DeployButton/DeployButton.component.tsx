@@ -8,8 +8,8 @@ import {
 } from "rsuite";
 import ArrowDownIcon from "@rsuite/icons/ArrowDown";
 import { IconWrapper } from "@ecoflow/components-lib";
-import { GrDeploy } from "react-icons/gr";
-import { RiNodeTree, RiRestartLine } from "react-icons/ri";
+import { GrConfigure, GrDeploy } from "react-icons/gr";
+import { RiRestartLine } from "react-icons/ri";
 import { TbBinaryTree2 } from "react-icons/tb";
 import { useAtomValue, useSetAtom } from "jotai";
 import {
@@ -55,9 +55,12 @@ export default function DeployButton() {
     );
   };
 
-  const deploy = (flowConfigurations: FlowsDescription) => {
+  const deploy = (
+    flowConfigurations: FlowsDescription,
+    current: boolean = false
+  ) => {
     setFlowLoading((isLoading) => ({ ...isLoading, flow: true }));
-    deployFlowConfigurations(flowConfigurations).then(
+    deployFlowConfigurations(flowConfigurations, current).then(
       (response: ApiResponse) => {
         clearLoadingsAndErrors();
         if (response.success)
@@ -137,7 +140,16 @@ export default function DeployButton() {
       return;
     }
 
-    deploy(flowConfigurations);
+    deploy(flowConfigurations, true);
+  };
+
+  const handleDeployConfigFlow = () => {
+    deploy(
+      {
+        configs: flowHandlers.flowEditorValue["configs"],
+      },
+      true
+    );
   };
 
   return (
@@ -163,6 +175,13 @@ export default function DeployButton() {
               case "CurrentFlow":
                 handleDeployCurrentFlow();
                 break;
+
+              case "ConfigFlow":
+                handleDeployConfigFlow();
+                break;
+              case "RestartFlow":
+                // TODO: Restart flow
+                break;
             }
           };
           return (
@@ -181,16 +200,16 @@ export default function DeployButton() {
                   Current Flow
                 </Dropdown.Item>
                 <Dropdown.Item
-                  eventKey="OnlyModifiedNode"
-                  disabled
-                  title="yet to be implemented"
-                  icon={<IconWrapper icon={RiNodeTree} />}
+                  eventKey="ConfigFlow"
+                  icon={<IconWrapper icon={GrConfigure} />}
                 >
-                  Modified Nodes
+                  Deploy Config Flow
                 </Dropdown.Item>
                 <Dropdown.Separator />
                 <Dropdown.Item
                   eventKey="RestartFlow"
+                  disabled
+                  title="Not Supported Yet."
                   icon={<IconWrapper icon={RiRestartLine} />}
                 >
                   Restart Flow

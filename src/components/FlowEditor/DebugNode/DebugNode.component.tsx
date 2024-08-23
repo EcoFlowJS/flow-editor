@@ -7,6 +7,9 @@ import { Badge, FlexboxGrid, Popover, Text, Tooltip, Whisper } from "rsuite";
 import isUndefined from "lodash/isUndefined";
 import isEmpty from "lodash/isEmpty";
 import iconFetcher from "../../../helper/iconFetcher";
+import colorGenerator from "../../../helper/colorGenerator";
+import { useAtomValue } from "jotai";
+import darkModeAtom from "../../../store/theme.mode";
 
 const DebugNode = memo(
   ({
@@ -15,8 +18,10 @@ const DebugNode = memo(
     isConnectable,
     selected,
   }: NodeProps<FlowsNodeDataTypes & { nodeDescription?: string }>) => {
+    const isDarkMode = useAtomValue(darkModeAtom);
     const {
       label,
+      color,
       icon,
       disabled,
       configured,
@@ -57,11 +62,18 @@ const DebugNode = memo(
                     className={`node node-debug ${selected ? "selected" : ""} ${
                       disabled ? "flow-node-disabled" : ""
                     }`}
-                    style={
-                      !isUndefined(appearance.label) && !appearance.label
+                    style={{
+                      ...(!isUndefined(appearance.label) && !appearance.label
                         ? { width: 30, minHeight: 30 }
-                        : { width: 130, minHeight: 30 }
-                    }
+                        : { width: 130, minHeight: 30 }),
+                      ...(color
+                        ? {
+                            backgroundColor: isDarkMode
+                              ? color
+                              : colorGenerator(color, 5)[3],
+                          }
+                        : {}),
+                    }}
                   >
                     {!isUndefined(appearance.label) && appearance.label ? (
                       <div
@@ -78,6 +90,13 @@ const DebugNode = memo(
                       style={{
                         ...(!isUndefined(appearance.label) && !appearance.label
                           ? { borderLeft: "none", borderRadius: 4 }
+                          : {}),
+                        ...(color
+                          ? {
+                              backgroundColor: isDarkMode
+                                ? color
+                                : colorGenerator(color, 5)[3],
+                            }
                           : {}),
                       }}
                     >
@@ -151,11 +170,18 @@ const DebugNode = memo(
                     className={`node node-debug ${selected ? "selected" : ""} ${
                       disabled ? "flow-node-disabled" : ""
                     }`}
-                    style={
-                      !isUndefined(appearance.label) && !appearance.label
+                    style={{
+                      ...(!isUndefined(appearance.label) && !appearance.label
                         ? { width: 30, minHeight: 30 }
-                        : { width: 130, minHeight: 30 }
-                    }
+                        : { width: 130, minHeight: 30 }),
+                      ...(color
+                        ? {
+                            backgroundColor: isDarkMode
+                              ? color
+                              : colorGenerator(color, 5)[3],
+                          }
+                        : {}),
+                    }}
                   >
                     {!isUndefined(appearance.label) && appearance.label ? (
                       <div
@@ -172,6 +198,13 @@ const DebugNode = memo(
                       style={{
                         ...(!isUndefined(appearance.label) && !appearance.label
                           ? { borderLeft: "none", borderRadius: 4 }
+                          : {}),
+                        ...(color
+                          ? {
+                              backgroundColor: isDarkMode
+                                ? color
+                                : colorGenerator(color, 5)[3],
+                            }
                           : {}),
                       }}
                     >

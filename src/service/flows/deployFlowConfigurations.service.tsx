@@ -3,11 +3,12 @@ import axios from "../../utils/axios/axios";
 import { AxiosError } from "axios";
 
 const deployFlowConfigurations = async (
-  flowconfigurations: FlowsDescription
+  flowconfigurations: FlowsDescription,
+  current: boolean = false
 ): Promise<ApiResponse> => {
   const res = await axios.post(
     `flows/deploy`,
-    { flowconfigurations },
+    { flowconfigurations, current },
     {
       headers: { "Content-Type": "application/json" },
     }

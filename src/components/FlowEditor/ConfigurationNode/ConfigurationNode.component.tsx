@@ -1,21 +1,18 @@
 import { IconWrapper } from "@ecoflow/components-lib";
 import { FlowsNodeDataTypes } from "@ecoflow/types";
-import { memo } from "react";
-import { GiServerRack } from "react-icons/gi";
-import { Handle, NodeProps, Position } from "reactflow";
-import { Badge, FlexboxGrid, Popover, Text, Tooltip, Whisper } from "rsuite";
 import isUndefined from "lodash/isUndefined";
-import isEmpty from "lodash/isEmpty";
+import { memo } from "react";
+import { NodeProps } from "reactflow";
+import { Badge, FlexboxGrid, Popover, Whisper } from "rsuite";
 import iconFetcher from "../../../helper/iconFetcher";
+import { GrConfigure } from "react-icons/gr";
 import { useAtomValue } from "jotai";
 import darkModeAtom from "../../../store/theme.mode";
 import colorGenerator from "../../../helper/colorGenerator";
 
-const MiddlewareNode = memo(
+const ConfigurationNode = memo(
   ({
-    id,
     data,
-    isConnectable,
     selected,
   }: NodeProps<FlowsNodeDataTypes & { nodeDescription?: string }>) => {
     const isDarkMode = useAtomValue(darkModeAtom);
@@ -28,6 +25,7 @@ const MiddlewareNode = memo(
       description,
       nodeDescription,
       appearance,
+      isError,
       openDrawer,
     } = data;
 
@@ -60,9 +58,11 @@ const MiddlewareNode = memo(
               >
                 <FlexboxGrid.Item>
                   <div
-                    className={`node node-middleware ${
+                    className={`node node-configuration ${
                       selected ? "selected" : ""
-                    } ${disabled ? "flow-node-disabled" : ""}`}
+                    } ${disabled ? "flow-node-disabled" : ""} ${
+                      isError ? "node-error" : ""
+                    }`}
                     style={{
                       ...(!isUndefined(appearance.label) && !appearance.label
                         ? { width: 30, minHeight: 30 }
@@ -80,14 +80,7 @@ const MiddlewareNode = memo(
                       className="node-icon-left"
                       style={{
                         ...(!isUndefined(appearance.label) && !appearance.label
-                          ? { borderLeft: "none", borderRadius: 4 }
-                          : {}),
-                        ...(color
-                          ? {
-                              backgroundColor: isDarkMode
-                                ? color
-                                : colorGenerator(color, 5)[3],
-                            }
+                          ? { borderRight: "none", borderRadius: 4 }
                           : {}),
                       }}
                     >
@@ -102,7 +95,7 @@ const MiddlewareNode = memo(
                               ? iconFetcher[appearance.icon]
                               : icon
                               ? icon
-                              : GiServerRack
+                              : GrConfigure
                           }
                         />
                       </FlexboxGrid>
@@ -115,57 +108,6 @@ const MiddlewareNode = memo(
                   </div>
                 </FlexboxGrid.Item>
               </FlexboxGrid>
-              {!isUndefined(appearance.portLabel?.input) &&
-              !isEmpty(appearance.portLabel.input) ? (
-                <Whisper
-                  placement="left"
-                  speaker={
-                    <Tooltip arrow={true}>
-                      <Text size="lg">{appearance.portLabel.input}</Text>
-                    </Tooltip>
-                  }
-                >
-                  <Handle
-                    type="target"
-                    position={Position.Left}
-                    id={`${id}-target`}
-                    isConnectable={isConnectable}
-                  />
-                </Whisper>
-              ) : (
-                <Handle
-                  type="target"
-                  position={Position.Left}
-                  id={`${id}-target`}
-                  isConnectable={isConnectable}
-                />
-              )}
-
-              {!isUndefined(appearance.portLabel?.output) &&
-              !isEmpty(appearance.portLabel.output) ? (
-                <Whisper
-                  placement="right"
-                  speaker={
-                    <Tooltip arrow={true}>
-                      <Text size="lg">{appearance.portLabel.output}</Text>
-                    </Tooltip>
-                  }
-                >
-                  <Handle
-                    type="source"
-                    position={Position.Right}
-                    id={`${id}-source`}
-                    isConnectable={isConnectable}
-                  />
-                </Whisper>
-              ) : (
-                <Handle
-                  type="source"
-                  position={Position.Right}
-                  id={`${id}-source`}
-                  isConnectable={isConnectable}
-                />
-              )}
             </div>
           </Whisper>
         ) : (
@@ -189,9 +131,11 @@ const MiddlewareNode = memo(
               >
                 <FlexboxGrid.Item>
                   <div
-                    className={`node node-middleware ${
+                    className={`node node-configuration ${
                       selected ? "selected" : ""
-                    } ${disabled ? "flow-node-disabled" : ""}`}
+                    } ${disabled ? "flow-node-disabled" : ""} ${
+                      isError ? "node-error" : ""
+                    }`}
                     style={{
                       ...(!isUndefined(appearance.label) && !appearance.label
                         ? { width: 30, minHeight: 30 }
@@ -209,14 +153,7 @@ const MiddlewareNode = memo(
                       className="node-icon-left"
                       style={{
                         ...(!isUndefined(appearance.label) && !appearance.label
-                          ? { borderLeft: "none", borderRadius: 4 }
-                          : {}),
-                        ...(color
-                          ? {
-                              backgroundColor: isDarkMode
-                                ? color
-                                : colorGenerator(color, 5)[3],
-                            }
+                          ? { borderRight: "none", borderRadius: 4 }
                           : {}),
                       }}
                     >
@@ -231,7 +168,7 @@ const MiddlewareNode = memo(
                               ? iconFetcher[appearance.icon]
                               : icon
                               ? icon
-                              : GiServerRack
+                              : GrConfigure
                           }
                         />
                       </FlexboxGrid>
@@ -244,58 +181,6 @@ const MiddlewareNode = memo(
                   </div>
                 </FlexboxGrid.Item>
               </FlexboxGrid>
-
-              {!isUndefined(appearance.portLabel?.input) &&
-              !isEmpty(appearance.portLabel.input) ? (
-                <Whisper
-                  placement="left"
-                  speaker={
-                    <Tooltip arrow={true}>
-                      <Text size="lg">{appearance.portLabel.input}</Text>
-                    </Tooltip>
-                  }
-                >
-                  <Handle
-                    type="target"
-                    position={Position.Left}
-                    id={`${id}-target`}
-                    isConnectable={isConnectable}
-                  />
-                </Whisper>
-              ) : (
-                <Handle
-                  type="target"
-                  position={Position.Left}
-                  id={`${id}-target`}
-                  isConnectable={isConnectable}
-                />
-              )}
-
-              {!isUndefined(appearance.portLabel?.output) &&
-              !isEmpty(appearance.portLabel.output) ? (
-                <Whisper
-                  placement="right"
-                  speaker={
-                    <Tooltip arrow={true}>
-                      <Text size="lg">{appearance.portLabel.output}</Text>
-                    </Tooltip>
-                  }
-                >
-                  <Handle
-                    type="source"
-                    position={Position.Right}
-                    id={`${id}-source`}
-                    isConnectable={isConnectable}
-                  />
-                </Whisper>
-              ) : (
-                <Handle
-                  type="source"
-                  position={Position.Right}
-                  id={`${id}-source`}
-                  isConnectable={isConnectable}
-                />
-              )}
             </Badge>
           </Whisper>
         )}
@@ -304,4 +189,4 @@ const MiddlewareNode = memo(
   }
 );
 
-export default MiddlewareNode;
+export default ConfigurationNode;

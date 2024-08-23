@@ -301,9 +301,8 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
        * @param {string} event.dataTransfer.getData("application/ecoflow/nodes") - The JSON data to parse.
        * @returns An object containing moduleID, type, label, configured, and nodeDescription properties.
        */
-      const { moduleID, type, label, configured, nodeDescription } = JSON.parse(
-        event.dataTransfer.getData("application/ecoflow/nodes")
-      );
+      const { moduleID, type, label, configured, nodeDescription, color } =
+        JSON.parse(event.dataTransfer.getData("application/ecoflow/nodes"));
 
       /**
        * Checks if the type is undefined or falsy, and returns early if it is.
@@ -311,6 +310,16 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
        * @returns None
        */
       if (typeof type === "undefined" || !type) return;
+
+      /**
+       * Checks if the active flow is "configs" and the type is not "Configuration", or if the active flow is not "configs" and the type is "Configuration".
+       * If the conditions are met, it returns early.
+       */
+      if (
+        (activeFlow === "configs" && type !== "Configuration") ||
+        (activeFlow !== "configs" && type === "Configuration")
+      )
+        return;
 
       /**
        * Converts screen coordinates to flow coordinates using the reactFlowInstance.
@@ -347,6 +356,7 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
         data: {
           moduleID,
           label,
+          color,
           configured,
           disabled: false,
           description: "",
@@ -389,7 +399,7 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
         configurations.concat([{ nodeID, configs: {} }])
       );
     },
-    [reactFlowInstance]
+    [reactFlowInstance, activeFlow]
   );
 
   const handleDrawerClosed = (
@@ -455,31 +465,33 @@ export default function Editor({ flow = "", disabled = false }: EditorProps) {
   useEffect(() => {
     if (isEmpty(activeFlow) && isEmpty(lastFlow)) return;
     setNodes(
-      flowHandlers.flowEditorValue[activeFlow].definitions.map((definition) => {
-        if (isUndefined(definition.data.openDrawer))
-          definition.data.openDrawer = (
-            label: string,
-            configured: boolean,
-            disabled: boolean,
-            description: string,
-            appearance: NodeAppearanceConfigurations
-          ) =>
-            openConfigurationDrawer(
-              definition.id,
-              definition.data.moduleID,
-              label,
-              configured,
-              disabled,
-              description,
-              appearance
-            );
+      (flowHandlers.flowEditorValue[activeFlow]?.definitions).map(
+        (definition) => {
+          if (isUndefined(definition.data.openDrawer))
+            definition.data.openDrawer = (
+              label: string,
+              configured: boolean,
+              disabled: boolean,
+              description: string,
+              appearance: NodeAppearanceConfigurations
+            ) =>
+              openConfigurationDrawer(
+                definition.id,
+                definition.data.moduleID,
+                label,
+                configured,
+                disabled,
+                description,
+                appearance
+              );
 
-        return definition;
-      })
+          return definition;
+        }
+      )
     );
-    setEdges(flowHandlers.flowEditorValue[activeFlow].connections);
+    setEdges(flowHandlers.flowEditorValue[activeFlow]?.connections);
     setNodeConfigurations(
-      flowHandlers.flowEditorValue[activeFlow].configurations
+      flowHandlers.flowEditorValue[activeFlow]?.configurations
     );
 
     flowHandlers.updateFlowEditor(lastFlow, {

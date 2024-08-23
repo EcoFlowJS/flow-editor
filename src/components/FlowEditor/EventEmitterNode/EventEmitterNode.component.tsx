@@ -6,6 +6,9 @@ import { Handle, NodeProps, Position } from "reactflow";
 import { Badge, FlexboxGrid, Popover, Text, Tooltip, Whisper } from "rsuite";
 import iconFetcher from "../../../helper/iconFetcher";
 import { TbTimelineEventPlus } from "react-icons/tb";
+import { useAtomValue } from "jotai";
+import darkModeAtom from "../../../store/theme.mode";
+import colorGenerator from "../../../helper/colorGenerator";
 
 const EventEmitterNode = memo(
   ({
@@ -13,8 +16,10 @@ const EventEmitterNode = memo(
     data,
     selected,
   }: NodeProps<FlowsNodeDataTypes & { nodeDescription?: string }>) => {
+    const isDarkMode = useAtomValue(darkModeAtom);
     const {
       label,
+      color,
       icon,
       configured,
       disabled,
@@ -56,11 +61,18 @@ const EventEmitterNode = memo(
                     className={`node node-event-emitter ${
                       selected ? "selected" : ""
                     } ${disabled ? "flow-node-disabled" : ""}`}
-                    style={
-                      !isUndefined(appearance.label) && !appearance.label
+                    style={{
+                      ...(!isUndefined(appearance.label) && !appearance.label
                         ? { width: 30, minHeight: 30 }
-                        : { width: 130, minHeight: 30 }
-                    }
+                        : { width: 130, minHeight: 30 }),
+                      ...(color
+                        ? {
+                            backgroundColor: isDarkMode
+                              ? color
+                              : colorGenerator(color, 5)[3],
+                          }
+                        : {}),
+                    }}
                   >
                     {!isUndefined(appearance.label) && appearance.label ? (
                       <div
@@ -77,6 +89,13 @@ const EventEmitterNode = memo(
                       style={{
                         ...(!isUndefined(appearance.label) && !appearance.label
                           ? { borderLeft: "none", borderRadius: 4 }
+                          : {}),
+                        ...(color
+                          ? {
+                              backgroundColor: isDarkMode
+                                ? color
+                                : colorGenerator(color, 5)[3],
+                            }
                           : {}),
                       }}
                     >
@@ -148,11 +167,18 @@ const EventEmitterNode = memo(
                     className={`node node-event-emitter ${
                       selected ? "selected" : ""
                     } ${disabled ? "flow-node-disabled" : ""}`}
-                    style={
-                      !isUndefined(appearance.label) && !appearance.label
+                    style={{
+                      ...(!isUndefined(appearance.label) && !appearance.label
                         ? { width: 30, minHeight: 30 }
-                        : { width: 130, minHeight: 30 }
-                    }
+                        : { width: 130, minHeight: 30 }),
+                      ...(color
+                        ? {
+                            backgroundColor: isDarkMode
+                              ? color
+                              : colorGenerator(color, 5)[3],
+                          }
+                        : {}),
+                    }}
                   >
                     {!isUndefined(appearance.label) && appearance.label ? (
                       <div
@@ -169,6 +195,13 @@ const EventEmitterNode = memo(
                       style={{
                         ...(!isUndefined(appearance.label) && !appearance.label
                           ? { borderLeft: "none", borderRadius: 4 }
+                          : {}),
+                        ...(color
+                          ? {
+                              backgroundColor: isDarkMode
+                                ? color
+                                : colorGenerator(color, 5)[3],
+                            }
                           : {}),
                       }}
                     >

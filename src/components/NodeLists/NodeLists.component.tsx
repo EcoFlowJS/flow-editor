@@ -43,7 +43,7 @@ export default function NodeLists() {
         setOpenKeys((response.payload as Modules).map((m) => m.id._id));
       }
     });
-  }, []);
+  }, [setEcoModules]);
 
   return (
     <Sidebar
@@ -82,8 +82,9 @@ export default function NodeLists() {
                       moduleID={node.id}
                       type={node.type}
                       label={node.name}
-                      description={node.describtion}
+                      description={node.description}
                       isInputsAvailable={node.inputs ? node.inputs.length : 0}
+                      color={node.color}
                     />
                   ))}
                 </Nav.Menu>
