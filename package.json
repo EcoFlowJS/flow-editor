@@ -1,6 +1,6 @@
 {
   "name": "@ecoflow/flow-editor",
-  "version": "0.1.34",
+  "version": "0.1.35",
   "main": "./index.cjs",
   "types": "./index.d.ts",
   "type": "module",
@@ -20,8 +20,8 @@
     "public"
   ],
   "dependencies": {
-    "@ecoflow/components-lib": "^0.1.30",
-    "@ecoflow/types": "^0.0.27",
+    "@ecoflow/components-lib": "^0.1.31",
+    "@ecoflow/types": "^0.0.28",
     "@koa/router": "^12.0.1",
     "@monaco-editor/react": "^4.6.0",
     "@rsuite/responsive-nav": "^5.0.1",
