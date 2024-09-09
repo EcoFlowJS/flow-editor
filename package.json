@@ -3,7 +3,6 @@
   "version": "0.1.35",
   "main": "./index.cjs",
   "types": "./index.d.ts",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
