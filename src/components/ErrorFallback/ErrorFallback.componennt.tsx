@@ -1,6 +1,6 @@
 export default function ErrorFallback({ error, resetErrorBoundary }: any) {
   // Call resetErrorBoundary() to reset the error boundary and retry the render.
-  console.log(error, resetErrorBoundary);
+  console.error(error, resetErrorBoundary);
 
   return (
     <div role="alert">

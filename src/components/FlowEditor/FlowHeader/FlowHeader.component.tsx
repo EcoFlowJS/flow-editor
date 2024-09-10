@@ -13,7 +13,9 @@ import { AlertModal, IconWrapper, FormGroup } from "@ecoflow/components-lib";
 import { BiSolidLayerPlus } from "react-icons/bi";
 import "./style.less";
 import flowEditorHandlers from "../../../hooks/flowEditorHandlers.hook";
-import { isEmpty, isString, isUndefined } from "lodash";
+import isEmpty from "lodash/isEmpty";
+import isString from "lodash/isString";
+import isUndefined from "lodash/isUndefined";
 import { useSetAtom } from "jotai";
 import {
   errorNotification,

@@ -1,6 +1,7 @@
 import { IconWrapper } from "@ecoflow/components-lib";
 import { FlowsNodeDataTypes } from "@ecoflow/types";
-import { isUndefined, isEmpty } from "lodash";
+import isUndefined from "lodash/isUndefined";
+import isEmpty from "lodash/isEmpty";
 import { memo } from "react";
 import { Handle, NodeProps, Position } from "reactflow";
 import { Badge, FlexboxGrid, Popover, Text, Tooltip, Whisper } from "rsuite";
