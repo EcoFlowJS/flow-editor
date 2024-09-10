@@ -1,9 +1,9 @@
-const mount = require("koa-mount");
-const serve = require("koa-static");
-const koaRouter = require("@koa/router");
-const fs = require("fs");
+import mount from "koa-mount";
+import serve from "koa-static";
+import koaRouter from "@koa/router";
+import fs from "fs";
 
-module.exports = (server) => {
+export default function (server) {
   const router = new koaRouter({ prefix: "/editor/flow" });
 
   router.get("/(.*)", async (ctx, next) => {
@@ -14,4 +14,4 @@ module.exports = (server) => {
 
   server.use(mount("/editor/flow", serve(__dirname + "/dist")));
   server.use(router.routes()).use(router.allowedMethods());
-};
+}
